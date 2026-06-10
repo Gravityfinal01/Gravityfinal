@@ -1,0 +1,33 @@
+# Generated Xcode project (regenerate with: xcodegen generate)
+*.xcodeproj/
+*.xcworkspace/
+
+# Xcode
+DerivedData/
+*.moved-aside
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+*.xccheckout
+*.xcscmblueprint
+
+# Build
+build/
+*.o
+*.d
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# CocoaPods
+Pods/
+Podfile.lock
