@@ -10,6 +10,7 @@ struct WardrobeView: View {
     @State private var selectedCategory: ClothingCategory?
     @State private var searchText = ""
     @State private var showSyncSheet = false
+    @State private var syncRotation: Double = 0
 
     var body: some View {
         NavigationStack {
@@ -34,6 +35,17 @@ struct WardrobeView: View {
             .onChange(of: networkMonitor.isOnLocalNetwork) { _, isLocal in
                 if isLocal {
                     Task { await vm.syncPendingItems() }
+                }
+            }
+            .onChange(of: vm.syncState == .syncing) { _, syncing in
+                if syncing {
+                    withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
+                        syncRotation = 360
+                    }
+                } else {
+                    withAnimation(.default) {
+                        syncRotation = 0
+                    }
                 }
             }
         }
@@ -73,8 +85,8 @@ struct WardrobeView: View {
             showSyncSheet = true
         } label: {
             ZStack(alignment: .topTrailing) {
-                Image(systemName: vm.syncState == .syncing ? "arrow.triangle.2.circlepath" : "arrow.triangle.2.circlepath")
-                    .symbolEffect(.rotate, isActive: vm.syncState == .syncing)
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .rotationEffect(.degrees(syncRotation))
                 if vm.pendingSyncCount > 0 {
                     Text("\(vm.pendingSyncCount)")
                         .font(.caption2.bold())
