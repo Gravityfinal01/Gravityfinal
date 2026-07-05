@@ -28,7 +28,7 @@ struct SettingsView: View {
                 } label: {
                     HStack(alignment: .top, spacing: 12) {
                         Image(systemName: vm.storageBackend == backend ? "checkmark.circle.fill" : "circle")
-                            .foregroundStyle(vm.storageBackend == backend ? .accentColor : .secondary)
+                            .foregroundStyle(vm.storageBackend == backend ? Color.accentColor : Color.secondary)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(backend.displayName).font(.body).foregroundStyle(.primary)
                             Text(backend.description).font(.caption).foregroundStyle(.secondary)
