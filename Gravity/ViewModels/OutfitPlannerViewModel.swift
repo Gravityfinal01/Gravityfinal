@@ -49,6 +49,41 @@ class OutfitPlannerViewModel: ObservableObject {
         isSaved = false
     }
 
+    func suggestOutfit(from items: [ClothingItem]) {
+        clearCanvas()
+
+        let tops = items.filter { [.shirt, .hoodie, .jacket].contains($0.category) }
+        let dresses = items.filter { $0.category == .dress }
+        let bottoms = items.filter { $0.category == .pants || $0.category == .shorts }
+        let shoes = items.filter { $0.category == .shoes }
+        let accessories = items.filter { $0.category == .accessories }
+
+        var picked: [ClothingItem] = []
+        if let dress = dresses.randomElement() {
+            picked.append(dress)
+        } else {
+            if let top = tops.randomElement() { picked.append(top) }
+            if let bottom = bottoms.randomElement() { picked.append(bottom) }
+        }
+        if let shoe = shoes.randomElement() { picked.append(shoe) }
+        if let acc = accessories.randomElement() { picked.append(acc) }
+
+        for item in picked { addItem(item) }
+
+        // Arrange: top-center, bottom-center, shoes below, accessory to the side
+        let layout: [(Double, Double)] = [
+            (0, -130),
+            (0, 60),
+            (0, 190),
+            (140, -70)
+        ]
+        for (i, _) in canvasEntries.enumerated() {
+            guard i < layout.count else { break }
+            canvasEntries[i].state.offsetX = layout[i].0
+            canvasEntries[i].state.offsetY = layout[i].1
+        }
+    }
+
     func saveOutfit(context: ModelContext, snapshot: UIImage?) {
         let statesDict = Dictionary(uniqueKeysWithValues: canvasEntries.map {
             ($0.item.id.uuidString, $0.state)

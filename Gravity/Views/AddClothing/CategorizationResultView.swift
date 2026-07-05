@@ -26,6 +26,8 @@ struct CategorizationResultView: View {
         switch vm.categorizationState {
         case .idle:
             EmptyView()
+        case .removingBackground:
+            ProgressView().scaleEffect(0.8)
         case .classifying:
             ProgressView().scaleEffect(0.8)
         case .enriching:
@@ -43,12 +45,14 @@ struct CategorizationResultView: View {
     private var stateLabel: some View {
         switch vm.categorizationState {
         case .idle: EmptyView()
+        case .removingBackground:
+            Text("Removing background\u{2026}").font(.subheadline)
         case .classifying:
-            Text("Detecting clothing type…").font(.subheadline)
+            Text("Detecting clothing type\u{2026}").font(.subheadline)
         case .enriching:
-            Text("Enhancing with AI…").font(.subheadline)
+            Text("Enhancing with AI\u{2026}").font(.subheadline)
         case .complete:
-            Text("AI categorized: \(vm.editableCategory.displayName)").font(.subheadline.weight(.medium))
+            Text("Categorized: \(vm.editableCategory.displayName)").font(.subheadline.weight(.medium))
         case .error(let msg):
             Text("Error: \(msg)").font(.subheadline).foregroundStyle(.red)
         }
@@ -78,7 +82,7 @@ struct CategorizationResultView: View {
         case .ollama: "Ollama"
         case .hybrid: "On-device + Ollama"
         }
-        parts.append("· \(sourceLabel)")
+        parts.append("\u{00b7} \(sourceLabel)")
         return parts.joined(separator: " ")
     }
 }

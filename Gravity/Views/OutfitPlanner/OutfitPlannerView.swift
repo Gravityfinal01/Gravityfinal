@@ -7,9 +7,7 @@ struct OutfitPlannerView: View {
     private var allItems: [ClothingItem]
 
     @StateObject private var vm = OutfitPlannerViewModel()
-    @State private var showItemPicker = false
     @State private var showSaveSheet = false
-    @State private var canvasViewRef: CanvasView?
 
     var body: some View {
         NavigationStack {
@@ -30,8 +28,17 @@ struct OutfitPlannerView: View {
                         .disabled(vm.canvasEntries.isEmpty)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") { showSaveSheet = true }
-                        .disabled(vm.canvasEntries.isEmpty)
+                    HStack(spacing: 16) {
+                        Button {
+                            vm.suggestOutfit(from: activeItems)
+                        } label: {
+                            Label("Suggest", systemImage: "wand.and.stars")
+                        }
+                        .disabled(activeItems.isEmpty)
+
+                        Button("Save") { showSaveSheet = true }
+                            .disabled(vm.canvasEntries.isEmpty)
+                    }
                 }
             }
             .sheet(isPresented: $showSaveSheet) {
@@ -41,9 +48,13 @@ struct OutfitPlannerView: View {
         }
     }
 
+    private var activeItems: [ClothingItem] {
+        allItems.filter { !$0.deletedLocally }
+    }
+
     private var itemDrawer: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Tap to add to canvas")
+            Text("Tap to add")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 16)
@@ -51,7 +62,7 @@ struct OutfitPlannerView: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    ForEach(allItems.filter { !$0.deletedLocally }) { item in
+                    ForEach(activeItems) { item in
                         Button {
                             vm.addItem(item)
                         } label: {

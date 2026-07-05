@@ -2,12 +2,13 @@ import SwiftUI
 import SwiftData
 
 enum CategorizationState: Equatable {
-    case idle, classifying, enriching, complete, error(String)
+    case idle, removingBackground, classifying, enriching, complete, error(String)
 }
 
 @MainActor
 class AddClothingViewModel: ObservableObject {
     @Published var selectedImage: UIImage?
+    @Published var processedImage: UIImage?
     @Published var categorizationState: CategorizationState = .idle
     @Published var result: CategorizationResult?
     @Published var editableName = ""
@@ -25,17 +26,24 @@ class AddClothingViewModel: ObservableObject {
 
     func processImage(_ image: UIImage, aiService: AICategorizationService) async {
         selectedImage = image
+        processedImage = nil
+        categorizationState = .removingBackground
+
+        // Step 0: on-device background removal (iOS 17+)
+        let bgRemoved = await BackgroundRemovalService.shared.removeBackground(from: image)
+        processedImage = bgRemoved
+
         categorizationState = .classifying
 
         // Phase 1: fast on-device Vision
-        let visionResult = await aiService.classifyWithVision(image: image)
+        let visionResult = await aiService.classifyWithVision(image: bgRemoved)
         result = visionResult
         editableCategory = visionResult.category
         editableName = visionResult.category.singularName
         categorizationState = .enriching
 
         // Phase 2: Ollama enrichment (if configured)
-        let fullResult = await aiService.categorize(image: image)
+        let fullResult = await aiService.categorize(image: bgRemoved)
         result = fullResult
         editableCategory = fullResult.category
         if let color = fullResult.color {
@@ -45,18 +53,17 @@ class AddClothingViewModel: ObservableObject {
     }
 
     func saveItem(context: ModelContext) async {
-        guard let image = selectedImage else { return }
+        guard let image = processedImage ?? selectedImage else { return }
         isSaving = true
         defer { isSaving = false }
 
         let itemId = UUID()
-        let filename = "\(itemId.uuidString).jpg"
+        let filename = "\(itemId.uuidString).png"
         let imageURL = Self.imagesDir.appendingPathComponent(filename)
 
-        guard let jpeg = image.jpegData(compressionQuality: 0.85) else { return }
-        try? jpeg.write(to: imageURL)
+        guard let png = image.pngData() else { return }
+        try? png.write(to: imageURL)
 
-        // Optionally save to Photos Library so iCloud Photos syncs it
         var photosId: String?
         let storageBackend = UserDefaults.standard.string(forKey: "storageBackend") ?? "local"
         if storageBackend == "photos" || storageBackend == "photosAndImmich" {
@@ -77,11 +84,8 @@ class AddClothingViewModel: ObservableObject {
         context.insert(item)
         try? context.save()
 
-        // Background Immich sync if configured
         if storageBackend == "immich" || storageBackend == "photosAndImmich" {
-            Task.detached {
-                // Sync handled by WardrobeViewModel.syncPendingItems()
-            }
+            Task.detached { }
         }
 
         didSave = true
@@ -89,6 +93,7 @@ class AddClothingViewModel: ObservableObject {
 
     func reset() {
         selectedImage = nil
+        processedImage = nil
         categorizationState = .idle
         result = nil
         editableName = ""

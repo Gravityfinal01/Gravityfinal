@@ -48,14 +48,32 @@ struct AddClothingView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.systemGray6))
-                .frame(height: 280)
+                .frame(height: 300)
 
-            if let image = vm.selectedImage {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(height: 280)
+            if let displayImage = vm.processedImage ?? vm.selectedImage {
+                CheckerboardPreview()
+                    .frame(height: 300)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+
+                Image(uiImage: displayImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 300)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+
+                if vm.categorizationState == .removingBackground {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.black.opacity(0.45))
+                        .frame(height: 300)
+                        .overlay(
+                            VStack(spacing: 8) {
+                                ProgressView().tint(.white)
+                                Text("Removing background\u{2026}")
+                                    .font(.caption)
+                                    .foregroundStyle(.white)
+                            }
+                        )
+                }
             } else {
                 VStack(spacing: 16) {
                     Image(systemName: "camera.viewfinder")
@@ -82,7 +100,7 @@ struct AddClothingView: View {
                 }
             }
 
-            if vm.selectedImage != nil {
+            if vm.selectedImage != nil && vm.categorizationState != .removingBackground {
                 VStack {
                     Spacer()
                     HStack {
@@ -96,6 +114,7 @@ struct AddClothingView: View {
                         .padding(12)
                     }
                 }
+                .frame(height: 300)
             }
         }
     }
@@ -149,6 +168,27 @@ struct AddClothingView: View {
             .foregroundStyle(.white)
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .disabled(vm.isSaving || vm.editableName.isEmpty)
+        .disabled(vm.isSaving || vm.editableName.isEmpty || vm.categorizationState == .removingBackground)
+    }
+}
+
+private struct CheckerboardPreview: View {
+    var body: some View {
+        Canvas { ctx, size in
+            let tile: CGFloat = 16
+            var x: CGFloat = 0
+            while x < size.width {
+                var y: CGFloat = 0
+                while y < size.height {
+                    let isEven = (Int(x / tile) + Int(y / tile)) % 2 == 0
+                    ctx.fill(
+                        Path(CGRect(x: x, y: y, width: tile, height: tile)),
+                        with: .color(isEven ? Color(.systemGray5) : Color(.systemGray4))
+                    )
+                    y += tile
+                }
+                x += tile
+            }
+        }
     }
 }

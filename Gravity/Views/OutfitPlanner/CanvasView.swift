@@ -6,14 +6,9 @@ struct CanvasView: View {
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                // Canvas background
-                Color(.systemGray6)
+                CheckerboardBackground()
                     .ignoresSafeArea(edges: .top)
 
-                // Grid lines for visual reference
-                canvasGrid
-
-                // Clothing layers sorted by zIndex
                 ForEach(vm.sortedEntries, id: \.item.id) { entry in
                     DraggableClothingLayer(
                         item: entry.item,
@@ -36,36 +31,37 @@ struct CanvasView: View {
         .clipShape(Rectangle())
     }
 
-    private var canvasGrid: some View {
-        Canvas { ctx, size in
-            let spacing: CGFloat = 40
-            var path = Path()
-            var x: CGFloat = 0
-            while x <= size.width {
-                path.move(to: CGPoint(x: x, y: 0))
-                path.addLine(to: CGPoint(x: x, y: size.height))
-                x += spacing
-            }
-            var y: CGFloat = 0
-            while y <= size.height {
-                path.move(to: CGPoint(x: 0, y: y))
-                path.addLine(to: CGPoint(x: size.width, y: y))
-                y += spacing
-            }
-            ctx.stroke(path, with: .color(.secondary.opacity(0.15)), lineWidth: 0.5)
-        }
-    }
-
     private var emptyCanvasHint: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "hand.tap")
-                .font(.system(size: 32))
+        VStack(spacing: 12) {
+            Image(systemName: "tshirt")
+                .font(.system(size: 40))
                 .foregroundStyle(.tertiary)
-            Text("Tap items below to add them to the canvas")
+            Text("Tap items below or use\nSuggest to build an outfit")
                 .font(.subheadline)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
         }
         .padding()
+    }
+}
+
+private struct CheckerboardBackground: View {
+    var body: some View {
+        Canvas { ctx, size in
+            let tile: CGFloat = 20
+            var x: CGFloat = 0
+            while x < size.width {
+                var y: CGFloat = 0
+                while y < size.height {
+                    let isEven = (Int(x / tile) + Int(y / tile)) % 2 == 0
+                    ctx.fill(
+                        Path(CGRect(x: x, y: y, width: tile, height: tile)),
+                        with: .color(isEven ? Color(.systemGray6) : Color(.systemGray5))
+                    )
+                    y += tile
+                }
+                x += tile
+            }
+        }
     }
 }
