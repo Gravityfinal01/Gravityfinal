@@ -12,7 +12,7 @@ struct OutfitPlannerView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                CanvasView(vm: vm)
+                BodyFigureView(vm: vm)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                 Divider()
@@ -25,7 +25,7 @@ struct OutfitPlannerView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Clear") { vm.clearCanvas() }
-                        .disabled(vm.canvasEntries.isEmpty)
+                        .disabled(vm.slots.isEmpty)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 16) {
@@ -37,7 +37,7 @@ struct OutfitPlannerView: View {
                         .disabled(activeItems.isEmpty)
 
                         Button("Save") { showSaveSheet = true }
-                            .disabled(vm.canvasEntries.isEmpty)
+                            .disabled(vm.slots.isEmpty)
                     }
                 }
             }
@@ -64,13 +64,15 @@ struct OutfitPlannerView: View {
                 HStack(spacing: 10) {
                     ForEach(activeItems) { item in
                         Button {
-                            vm.addItem(item)
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                                vm.addToSlot(item)
+                            }
                         } label: {
                             ItemImageView(item: item, size: CGSize(width: 70, height: 80))
                                 .frame(width: 70, height: 80)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                                 .overlay(
-                                    vm.canvasEntries.contains(where: { $0.item.id == item.id })
+                                    vm.slots.values.contains(where: { $0.id == item.id })
                                     ? RoundedRectangle(cornerRadius: 8)
                                         .strokeBorder(Color.accentColor, lineWidth: 2)
                                     : nil
