@@ -55,7 +55,9 @@ struct ClothingItemCard: View {
     private var syncBadge: some View {
         switch item.syncStatus {
         case .local:
-            EmptyView()
+            Image(systemName: "icloud.slash")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
         case .syncing:
             Label("Syncing\u{2026}", systemImage: "arrow.triangle.2.circlepath")
                 .font(.caption2)
