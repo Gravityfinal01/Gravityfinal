@@ -141,6 +141,32 @@ struct AddClothingView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
 
+            if vm.editableCategory.hasSubcategories {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Type").font(.caption).foregroundStyle(.secondary)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(vm.editableCategory.subcategories) { sub in
+                                let selected = vm.editableSubcategory == sub
+                                Button {
+                                    vm.editableSubcategory = selected ? nil : sub
+                                } label: {
+                                    Text(sub.displayName)
+                                        .font(.subheadline.weight(.medium))
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .background(selected ? Color.accentColor : Color(.systemGray6))
+                                        .foregroundStyle(selected ? Color.white : Color.primary)
+                                        .clipShape(Capsule())
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.vertical, 2)
+                    }
+                }
+            }
+
             VStack(alignment: .leading, spacing: 6) {
                 Text("Brand (optional)").font(.caption).foregroundStyle(.secondary)
                 TextField("e.g. Nike, Zara", text: $vm.editableBrand)

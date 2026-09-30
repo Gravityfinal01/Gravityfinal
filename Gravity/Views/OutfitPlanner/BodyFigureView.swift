@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - BodyZone
 
 enum BodyZone: String, Hashable, CaseIterable {
-    case torso, fullBody, legs, feet, accessories
+    case torso, outerwear, fullBody, legs, feet, accessories
 
     func zoneRect(mx: CGFloat, my: CGFloat, fw: CGFloat, fh: CGFloat) -> CGRect {
         let ox = mx - fw / 2
@@ -11,6 +11,9 @@ enum BodyZone: String, Hashable, CaseIterable {
         switch self {
         case .torso:
             return CGRect(x: ox + fw * 0.21, y: oy + fh * 0.14, width: fw * 0.58, height: fh * 0.38)
+        case .outerwear:
+            // Slightly larger than torso so a jacket reads as layered over the top underneath.
+            return CGRect(x: ox + fw * 0.13, y: oy + fh * 0.12, width: fw * 0.74, height: fh * 0.42)
         case .fullBody:
             return CGRect(x: ox + fw * 0.21, y: oy + fh * 0.14, width: fw * 0.58, height: fh * 0.74)
         case .legs:
@@ -24,7 +27,8 @@ enum BodyZone: String, Hashable, CaseIterable {
 
     var zIndex: Double {
         switch self {
-        case .accessories:       return 4
+        case .accessories:       return 5
+        case .outerwear:         return 4
         case .torso, .fullBody:  return 3
         case .legs:              return 2
         case .feet:              return 1
@@ -35,11 +39,12 @@ enum BodyZone: String, Hashable, CaseIterable {
 extension ClothingCategory {
     var bodyZone: BodyZone {
         switch self {
-        case .shirt, .hoodie, .jacket: return .torso
-        case .dress:                   return .fullBody
-        case .pants, .shorts:          return .legs
-        case .shoes:                   return .feet
-        case .accessories, .other:     return .accessories
+        case .tops, .sweaters:     return .torso
+        case .jackets:             return .outerwear
+        case .dresses:             return .fullBody
+        case .bottoms:             return .legs
+        case .shoes:               return .feet
+        case .accessories, .other: return .accessories
         }
     }
 }

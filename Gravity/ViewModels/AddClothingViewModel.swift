@@ -13,7 +13,15 @@ class AddClothingViewModel: ObservableObject {
     @Published var result: CategorizationResult?
     @Published var editableName = ""
     @Published var editableBrand = ""
-    @Published var editableCategory: ClothingCategory = .other
+    @Published var editableCategory: ClothingCategory = .other {
+        didSet {
+            // Drop a subcategory that no longer belongs to the chosen parent.
+            if let sub = editableSubcategory, sub.parent != editableCategory {
+                editableSubcategory = nil
+            }
+        }
+    }
+    @Published var editableSubcategory: ClothingSubcategory?
     @Published var isSaving = false
     @Published var didSave = false
 
@@ -39,17 +47,28 @@ class AddClothingViewModel: ObservableObject {
         let visionResult = await aiService.classifyWithVision(image: bgRemoved)
         result = visionResult
         editableCategory = visionResult.category
-        editableName = visionResult.category.singularName
+        editableSubcategory = visionResult.subcategory
+        editableName = Self.defaultName(editableCategory, editableSubcategory, color: nil)
         categorizationState = .enriching
 
         // Phase 2: Ollama enrichment (if configured)
         let fullResult = await aiService.categorize(image: bgRemoved)
         result = fullResult
         editableCategory = fullResult.category
-        if let color = fullResult.color {
-            editableName = "\(color.capitalized) \(fullResult.category.singularName)"
+        // Prefer Ollama's subcategory; otherwise keep Vision's if it still fits the parent.
+        if let sub = fullResult.subcategory {
+            editableSubcategory = sub
+        } else if let sub = visionResult.subcategory, sub.parent == fullResult.category {
+            editableSubcategory = sub
         }
+        editableName = Self.defaultName(editableCategory, editableSubcategory, color: fullResult.color)
         categorizationState = .complete
+    }
+
+    private static func defaultName(_ category: ClothingCategory, _ subcategory: ClothingSubcategory?, color: String?) -> String {
+        let base = subcategory?.singularName ?? category.singularName
+        if let color, !color.isEmpty { return "\(color.capitalized) \(base)" }
+        return base
     }
 
     func saveItem(context: ModelContext) async {
@@ -70,11 +89,14 @@ class AddClothingViewModel: ObservableObject {
             photosId = try? await PhotoLibraryService.shared.save(image)
         }
 
-        let name = editableName.isEmpty ? editableCategory.singularName : editableName
+        let name = editableName.isEmpty
+            ? Self.defaultName(editableCategory, editableSubcategory, color: nil)
+            : editableName
         let item = ClothingItem(
             id: itemId,
             name: name,
             category: editableCategory,
+            subcategory: editableSubcategory,
             color: result?.color,
             brand: editableBrand.isEmpty ? nil : editableBrand,
             tags: result?.tags ?? [],
@@ -99,6 +121,7 @@ class AddClothingViewModel: ObservableObject {
         editableName = ""
         editableBrand = ""
         editableCategory = .other
+        editableSubcategory = nil
         isSaving = false
         didSave = false
     }

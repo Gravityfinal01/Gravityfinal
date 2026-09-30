@@ -12,7 +12,8 @@ struct ClothingItemCard: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 200)
 
-                Label(item.category.displayName, systemImage: item.category.systemImage)
+                Label(item.subcategory?.singularName ?? item.category.singularName,
+                      systemImage: item.category.systemImage)
                     .font(.caption2.weight(.medium))
                     .padding(.horizontal, 7)
                     .padding(.vertical, 4)

@@ -41,17 +41,25 @@ class OutfitPlannerViewModel: ObservableObject {
     func suggestOutfit(from items: [ClothingItem]) {
         clearCanvas()
 
-        let tops     = items.filter { [.shirt, .hoodie, .jacket].contains($0.category) }
-        let dresses  = items.filter { $0.category == .dress }
-        let bottoms  = items.filter { $0.category == .pants || $0.category == .shorts }
+        let tops     = items.filter { $0.category == .tops || $0.category == .sweaters }
+        let jackets  = items.filter { $0.category == .jackets }
+        let dresses  = items.filter { $0.category == .dresses }
+        let bottoms  = items.filter { $0.category == .bottoms }
         let shoes    = items.filter { $0.category == .shoes }
         let accs     = items.filter { $0.category == .accessories }
 
-        if let dress = dresses.randomElement() {
+        // Pick a dress when it's the only complete option, otherwise flip a coin so
+        // both dresses and top+bottom combos get suggested over time.
+        let canDoSeparates = !tops.isEmpty && !bottoms.isEmpty
+        if let dress = dresses.randomElement(), !canDoSeparates || Bool.random() {
             slots[BodyZone.fullBody.rawValue] = dress
         } else {
             if let top    = tops.randomElement()    { slots[BodyZone.torso.rawValue] = top }
             if let bottom = bottoms.randomElement() { slots[BodyZone.legs.rawValue]  = bottom }
+        }
+        // Jackets layer over anything, so include one about half the time.
+        if let jacket = jackets.randomElement(), Bool.random() {
+            slots[BodyZone.outerwear.rawValue] = jacket
         }
         if let shoe = shoes.randomElement() { slots[BodyZone.feet.rawValue]        = shoe }
         if let acc  = accs.randomElement()  { slots[BodyZone.accessories.rawValue] = acc }

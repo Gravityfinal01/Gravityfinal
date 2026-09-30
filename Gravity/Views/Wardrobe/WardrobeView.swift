@@ -8,6 +8,7 @@ struct WardrobeView: View {
 
     @StateObject private var vm = WardrobeViewModel()
     @State private var selectedCategory: ClothingCategory?
+    @State private var selectedSubcategory: ClothingSubcategory?
     @State private var searchText = ""
     @State private var showSyncSheet = false
     @State private var syncRotation: Double = 0
@@ -16,7 +17,15 @@ struct WardrobeView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 categoryPills
-                ClothingGridView(category: selectedCategory, searchText: searchText, vm: vm)
+                if let cat = selectedCategory, cat.hasSubcategories {
+                    subcategoryPills(for: cat)
+                }
+                ClothingGridView(
+                    category: selectedCategory,
+                    subcategory: selectedSubcategory,
+                    searchText: searchText,
+                    vm: vm
+                )
             }
             .navigationTitle("Wardrobe")
             .searchable(text: $searchText, prompt: "Search clothes…")
@@ -64,9 +73,39 @@ struct WardrobeView: View {
         }
     }
 
+    private func subcategoryPills(for category: ClothingCategory) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 6) {
+                subPill(label: "All", subcategory: nil)
+                ForEach(category.subcategories) { sub in
+                    subPill(label: sub.displayName, subcategory: sub)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 10)
+        }
+    }
+
+    private func subPill(label: String, subcategory: ClothingSubcategory?) -> some View {
+        let selected = selectedSubcategory == subcategory
+        return Button {
+            selectedSubcategory = subcategory
+        } label: {
+            Text(label)
+                .font(.caption.weight(.medium))
+                .padding(.horizontal, 11)
+                .padding(.vertical, 5)
+                .background(selected ? Color.accentColor.opacity(0.18) : Color(.systemGray6))
+                .foregroundStyle(selected ? Color.accentColor : Color.secondary)
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
     private func pill(label: String, category: ClothingCategory?) -> some View {
         Button {
             selectedCategory = category
+            selectedSubcategory = nil
         } label: {
             Text(label)
                 .font(.subheadline.weight(.medium))

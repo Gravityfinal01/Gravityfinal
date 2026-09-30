@@ -18,7 +18,25 @@ class WardrobeViewModel: ObservableObject {
         self.immichService = immichService
         self.networkMonitor = networkMonitor
         self.modelContext = context
+        migrateLegacyCategories()
         updatePendingCount()
+    }
+
+    /// One-time rewrite of rows saved under the old flat category scheme ("shirt", "hoodie", …)
+    /// so they show up under the new Tops/Sweaters/etc. filters. No-op once everything is migrated.
+    private func migrateLegacyCategories() {
+        guard let context = modelContext else { return }
+        let all = (try? context.fetch(FetchDescriptor<ClothingItem>())) ?? []
+        var changed = false
+        for item in all where ClothingCategory(rawValue: item.categoryRaw) == nil {
+            let mapped = ClothingCategory.fromLegacy(item.categoryRaw)
+            item.categoryRaw = mapped.category.rawValue
+            if item.subcategoryRaw == nil, let sub = mapped.subcategory {
+                item.subcategoryRaw = sub.rawValue
+            }
+            changed = true
+        }
+        if changed { try? context.save() }
     }
 
     func updatePendingCount() {

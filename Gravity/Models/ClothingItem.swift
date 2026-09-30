@@ -14,6 +14,7 @@ class ClothingItem {
     var name: String
     // Stored as rawValue strings for reliable SwiftData predicate support
     var categoryRaw: String
+    var subcategoryRaw: String?
     var color: String?
     var brand: String?
     var tags: [String]
@@ -29,6 +30,7 @@ class ClothingItem {
         id: UUID = UUID(),
         name: String,
         category: ClothingCategory,
+        subcategory: ClothingSubcategory? = nil,
         color: String? = nil,
         brand: String? = nil,
         tags: [String] = [],
@@ -43,6 +45,7 @@ class ClothingItem {
         self.id = id
         self.name = name
         self.categoryRaw = category.rawValue
+        self.subcategoryRaw = subcategory?.rawValue
         self.color = color
         self.brand = brand
         self.tags = tags
@@ -56,8 +59,17 @@ class ClothingItem {
     }
 
     var category: ClothingCategory {
-        get { ClothingCategory(rawValue: categoryRaw) ?? .other }
+        // fromLegacy also handles current raw values, so old and new rows both resolve.
+        get { ClothingCategory.fromLegacy(categoryRaw).category }
         set { categoryRaw = newValue.rawValue }
+    }
+
+    var subcategory: ClothingSubcategory? {
+        get {
+            if let raw = subcategoryRaw, let sub = ClothingSubcategory(rawValue: raw) { return sub }
+            return ClothingCategory.fromLegacy(categoryRaw).subcategory
+        }
+        set { subcategoryRaw = newValue?.rawValue }
     }
 
     var syncStatus: SyncStatus {
