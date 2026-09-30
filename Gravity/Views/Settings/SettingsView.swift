@@ -6,6 +6,7 @@ struct SettingsView: View {
     @AppStorage(AppAppearance.storageKey) private var appearanceRaw = AppAppearance.system.rawValue
     @AppStorage(WardrobeLayout.storageKey) private var layoutRaw = WardrobeLayout.detailed.rawValue
     @AppStorage(WelcomeView.completedKey) private var hasCompletedWelcome = false
+    @AppStorage(ThemeColor.storageKey) private var themeRaw = ThemeColor.blue.rawValue
 
     var body: some View {
         NavigationStack {
@@ -33,6 +34,36 @@ struct SettingsView: View {
                 }
             }
             .pickerStyle(.segmented)
+
+            HStack(spacing: 14) {
+                ForEach(ThemeColor.allCases) { theme in
+                    let selected = themeRaw == theme.rawValue
+                    Button {
+                        themeRaw = theme.rawValue
+                    } label: {
+                        Circle()
+                            .fill(theme.color)
+                            .frame(width: 30, height: 30)
+                            .overlay {
+                                if selected {
+                                    Image(systemName: "checkmark")
+                                        .font(.caption.bold())
+                                        .foregroundStyle(.white)
+                                }
+                            }
+                            .overlay {
+                                Circle()
+                                    .strokeBorder(theme.color, lineWidth: 2)
+                                    .frame(width: 38, height: 38)
+                                    .opacity(selected ? 1 : 0)
+                            }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(theme.displayName)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.vertical, 6)
         } header: {
             Text("Appearance")
         }
@@ -84,8 +115,14 @@ struct SettingsView: View {
                     HStack(alignment: .top, spacing: 12) {
                         Image(systemName: vm.storageBackend == backend ? "checkmark.circle.fill" : "circle")
                             .foregroundStyle(vm.storageBackend == backend ? Color.accentColor : Color.secondary)
+                            .padding(.top, 2)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(backend.displayName).font(.body).foregroundStyle(.primary)
+                            HStack(spacing: 6) {
+                                Image(systemName: backend.systemImage)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text(backend.displayName).font(.body).foregroundStyle(.primary)
+                            }
                             Text(backend.description).font(.caption).foregroundStyle(.secondary)
                         }
                     }
@@ -93,10 +130,25 @@ struct SettingsView: View {
                 }
                 .buttonStyle(.plain)
             }
+
+            Toggle(isOn: $vm.saveCopyToPhotos) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Also save to Photos app")
+                    Text("Keeps a copy of each cutout in your photo library.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
         } header: {
-            Text("Photo Storage")
+            Text("Storage")
         } footer: {
-            Text("iCloud Photos requires no server setup — photos sync automatically across your Apple devices.")
+            if vm.needsRestartForStorage {
+                Label("Quit and reopen Gravity to switch iCloud sync \(vm.storageBackend.usesICloud ? "on" : "off").",
+                      systemImage: "arrow.counterclockwise")
+                    .foregroundStyle(.orange)
+            } else {
+                Text("A copy always stays on this iPhone so the app works offline. iCloud needs you to be signed in to iCloud on this device.")
+            }
         }
     }
 
@@ -183,7 +235,7 @@ struct SettingsView: View {
         } header: {
             Text("About")
         } footer: {
-            Text("Gravity is free forever with no subscriptions or in-app purchases. Photos stay on your iPhone, in your own iCloud Photos, or on a server you run.")
+            Text("Gravity is free forever with no subscriptions or in-app purchases. Your wardrobe stays on your iPhone, in your own iCloud, or on a server you run.")
         }
     }
 

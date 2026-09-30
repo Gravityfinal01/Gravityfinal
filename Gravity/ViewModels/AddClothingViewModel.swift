@@ -93,9 +93,9 @@ class AddClothingViewModel: ObservableObject {
         guard let png = image.pngData() else { return }
         try? png.write(to: imageURL)
 
+        // Optional copy in the user's Photos app (independent of the storage backend).
         var photosId: String?
-        let storageBackend = UserDefaults.standard.string(forKey: "storageBackend") ?? "local"
-        if storageBackend == "photos" || storageBackend == "photosAndImmich" {
+        if StorageBackend.saveCopyToPhotos {
             photosId = try? await PhotoLibraryService.shared.save(image)
         }
 
@@ -116,10 +116,7 @@ class AddClothingViewModel: ObservableObject {
         context.insert(item)
         try? context.save()
 
-        if storageBackend == "immich" || storageBackend == "photosAndImmich" {
-            Task.detached { }
-        }
-
+        // Immich upload (if enabled) is handled by WardrobeViewModel.syncPendingItems().
         didSave = true
     }
 

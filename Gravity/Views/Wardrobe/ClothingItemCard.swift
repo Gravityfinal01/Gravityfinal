@@ -2,10 +2,10 @@ import SwiftUI
 
 struct ClothingItemCard: View {
     let item: ClothingItem
-    @AppStorage("storageBackend") private var storageBackendRaw = StorageBackend.local.rawValue
+    @AppStorage(StorageBackend.storageKey) private var storageBackendRaw = StorageBackend.local.rawValue
 
     private var showSyncStatus: Bool {
-        (StorageBackend(rawValue: storageBackendRaw) ?? .local).requiresImmich
+        StorageBackend.resolve(storageBackendRaw).requiresImmich
     }
 
     var body: some View {

@@ -12,11 +12,11 @@ struct WardrobeView: View {
     @State private var searchText = ""
     @State private var showSyncSheet = false
     @State private var syncRotation: Double = 0
-    @AppStorage("storageBackend") private var storageBackendRaw = StorageBackend.local.rawValue
+    @AppStorage(StorageBackend.storageKey) private var storageBackendRaw = StorageBackend.local.rawValue
 
     /// Sync UI only makes sense when an Immich server is part of the storage setup.
     private var syncEnabled: Bool {
-        (StorageBackend(rawValue: storageBackendRaw) ?? .local).requiresImmich
+        StorageBackend.resolve(storageBackendRaw).requiresImmich
     }
 
     var body: some View {

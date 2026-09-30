@@ -26,6 +26,37 @@ enum AppAppearance: String, CaseIterable, Identifiable {
     }
 }
 
+/// App-wide accent color. Pastel-leaning but dark enough to carry white text.
+enum ThemeColor: String, CaseIterable, Identifiable {
+    case blue, pink, yellow, brown, green, red
+
+    static let storageKey = "themeColor"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .blue:   return "Blue"
+        case .pink:   return "Pink"
+        case .yellow: return "Yellow"
+        case .brown:  return "Brown"
+        case .green:  return "Green"
+        case .red:    return "Red"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .blue:   return Color(red: 0.36, green: 0.56, blue: 0.93)
+        case .pink:   return Color(red: 0.93, green: 0.55, blue: 0.72)
+        case .yellow: return Color(red: 0.90, green: 0.71, blue: 0.27)
+        case .brown:  return Color(red: 0.67, green: 0.51, blue: 0.38)
+        case .green:  return Color(red: 0.42, green: 0.72, blue: 0.55)
+        case .red:    return Color(red: 0.88, green: 0.47, blue: 0.47)
+        }
+    }
+}
+
 /// How items are laid out in the Wardrobe tab.
 enum WardrobeLayout: String, CaseIterable, Identifiable {
     case list, compact, detailed

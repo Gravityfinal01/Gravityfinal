@@ -147,19 +147,20 @@ class OutfitPlannerViewModel: ObservableObject {
         loadedOutfit = outfit
         outfitName = outfit.name
 
+        let items = outfit.items ?? []
         let states = outfit.canvasStates
         if states.isEmpty {
             // Saved without layout data (e.g. by the earlier body-model version): place by category.
-            for item in outfit.items {
+            for item in items {
                 addItem(item, at: Self.defaultOffset(for: item.category))
             }
             return
         }
 
-        canvasEntries = outfit.items.compactMap { item in
+        canvasEntries = items.compactMap { item in
             states[item.id.uuidString].map { (item: item, state: $0) }
         }
-        for item in outfit.items where states[item.id.uuidString] == nil {
+        for item in items where states[item.id.uuidString] == nil {
             addItem(item, at: Self.defaultOffset(for: item.category))
         }
     }

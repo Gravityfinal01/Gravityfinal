@@ -8,23 +8,28 @@ enum SyncStatus: String, Codable {
     case failed
 }
 
+// CloudKit-backed SwiftData requires every stored property to be optional or
+// have a default, and every relationship to be optional. Keep it that way.
 @Model
 class ClothingItem {
-    var id: UUID
-    var name: String
+    var id: UUID = UUID()
+    var name: String = ""
     // Stored as rawValue strings for reliable SwiftData predicate support
-    var categoryRaw: String
+    var categoryRaw: String = ClothingCategory.other.rawValue
     var subcategoryRaw: String?
     var color: String?
     var brand: String?
-    var tags: [String]
-    var localImagePath: String          // filename inside Documents/images/
-    var photosAssetIdentifier: String?  // PHAsset.localIdentifier when saved to Photos Library
+    var tags: [String] = []
+    var localImagePath: String = ""      // filename inside Documents/images/
+    var photosAssetIdentifier: String?   // PHAsset.localIdentifier when a copy was saved to Photos
     var immichAssetId: String?
     var immichAlbumId: String?
-    var syncStatusRaw: String
-    var deletedLocally: Bool
-    var dateAdded: Date
+    var syncStatusRaw: String = SyncStatus.local.rawValue
+    var deletedLocally: Bool = false
+    var dateAdded: Date = Date()
+
+    /// Inverse of Outfit.items. Maintained by SwiftData.
+    var outfits: [Outfit]?
 
     init(
         id: UUID = UUID(),

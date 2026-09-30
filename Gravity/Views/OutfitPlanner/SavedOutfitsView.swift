@@ -107,7 +107,8 @@ private struct OutfitCard: View {
             Text(outfit.name)
                 .font(.subheadline.weight(.semibold))
                 .lineLimit(1)
-            Text("\(outfit.items.count) item\(outfit.items.count == 1 ? "" : "s") \u{00b7} \(outfit.lastModified.formatted(date: .abbreviated, time: .omitted))")
+            let count = outfit.items?.count ?? 0
+            Text("\(count) item\(count == 1 ? "" : "s") \u{00b7} \(outfit.lastModified.formatted(date: .abbreviated, time: .omitted))")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

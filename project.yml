@@ -13,6 +13,8 @@ targets:
     deploymentTarget: "17.0"
     sources:
       - path: Gravity
+    entitlements:
+      path: Gravity/Gravity.entitlements
     settings:
       base:
         SWIFT_VERSION: "5.9"

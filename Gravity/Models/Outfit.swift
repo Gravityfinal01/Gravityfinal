@@ -1,15 +1,18 @@
 import SwiftData
 import Foundation
 
+// CloudKit-backed SwiftData requires defaults on stored properties and optional
+// relationships. `items` is optional for that reason; read it as `items ?? []`.
 @Model
 class Outfit {
-    var id: UUID
-    var name: String
-    @Relationship(deleteRule: .nullify) var items: [ClothingItem]
+    var id: UUID = UUID()
+    var name: String = ""
+    @Relationship(deleteRule: .nullify, inverse: \ClothingItem.outfits)
+    var items: [ClothingItem]?
     var canvasStatesData: Data?     // encoded [String (UUID): CanvasItemState]
     var snapshotPath: String?       // filename in Documents/images/
-    var dateCreated: Date
-    var lastModified: Date
+    var dateCreated: Date = Date()
+    var lastModified: Date = Date()
 
     init(
         id: UUID = UUID(),

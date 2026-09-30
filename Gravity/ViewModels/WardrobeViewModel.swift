@@ -53,8 +53,7 @@ class WardrobeViewModel: ObservableObject {
               let monitor = networkMonitor,
               monitor.isOnLocalNetwork else { return }
 
-        let storageBackend = UserDefaults.standard.string(forKey: "storageBackend") ?? "local"
-        guard storageBackend == "immich" || storageBackend == "photosAndImmich" else { return }
+        guard StorageBackend.current.requiresImmich else { return }
 
         syncState = .syncing
 

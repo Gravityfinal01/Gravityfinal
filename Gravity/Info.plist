@@ -23,7 +23,11 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Gravity reads your photo library to import clothing photos.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Gravity saves clothing photos to your library so they sync via iCloud Photos.</string>
+	<string>Gravity can save a copy of each clothing cutout to your Photos app.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UIApplicationSceneManifest</key>

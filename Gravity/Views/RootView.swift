@@ -1,20 +1,6 @@
 import SwiftUI
 
 struct RootView: View {
-    @AppStorage(AppAppearance.storageKey) private var appearanceRaw = AppAppearance.system.rawValue
-    @AppStorage(WelcomeView.completedKey) private var hasCompletedWelcome = false
-
-    private var appearance: AppAppearance {
-        AppAppearance(rawValue: appearanceRaw) ?? .system
-    }
-
-    private var showWelcome: Binding<Bool> {
-        Binding(
-            get: { !hasCompletedWelcome },
-            set: { if !$0 { hasCompletedWelcome = true } }
-        )
-    }
-
     var body: some View {
         TabView {
             WardrobeView()
@@ -36,11 +22,6 @@ struct RootView: View {
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }
-        }
-        .preferredColorScheme(appearance.colorScheme)
-        .fullScreenCover(isPresented: showWelcome) {
-            WelcomeView()
-                .preferredColorScheme(appearance.colorScheme)
         }
     }
 }
