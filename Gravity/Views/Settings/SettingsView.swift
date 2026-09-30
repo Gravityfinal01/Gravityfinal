@@ -5,6 +5,7 @@ struct SettingsView: View {
     @StateObject private var vm = SettingsViewModel()
     @AppStorage(AppAppearance.storageKey) private var appearanceRaw = AppAppearance.system.rawValue
     @AppStorage(WardrobeLayout.storageKey) private var layoutRaw = WardrobeLayout.detailed.rawValue
+    @AppStorage(WelcomeView.completedKey) private var hasCompletedWelcome = false
 
     var body: some View {
         NavigationStack {
@@ -172,10 +173,17 @@ struct SettingsView: View {
     // MARK: - About
 
     private var aboutSection: some View {
-        Section("About") {
+        Section {
             LabeledContent("Version", value: "1.0")
             LabeledContent("AI", value: "Apple Vision + Ollama (local)")
             LabeledContent("Storage", value: vm.storageBackend.displayName)
+            Button("Show Welcome Screen") {
+                hasCompletedWelcome = false
+            }
+        } header: {
+            Text("About")
+        } footer: {
+            Text("Gravity is free forever with no subscriptions or in-app purchases. Photos stay on your iPhone, in your own iCloud Photos, or on a server you run.")
         }
     }
 

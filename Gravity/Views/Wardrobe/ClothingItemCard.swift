@@ -2,6 +2,11 @@ import SwiftUI
 
 struct ClothingItemCard: View {
     let item: ClothingItem
+    @AppStorage("storageBackend") private var storageBackendRaw = StorageBackend.local.rawValue
+
+    private var showSyncStatus: Bool {
+        (StorageBackend(rawValue: storageBackendRaw) ?? .local).requiresImmich
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -42,7 +47,9 @@ struct ClothingItemCard: View {
                     }
                 }
 
-                syncBadge
+                if showSyncStatus {
+                    syncBadge
+                }
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
