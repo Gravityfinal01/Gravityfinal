@@ -50,24 +50,27 @@ struct ItemImageView: View {
     }
 
     private func loadImages() async {
-        // Try Photos Library first (fastest for local network, works offline)
+        // Local PNG first: it keeps the transparent background from background removal,
+        // whereas Photos re-encodes the image and flattens it onto white.
+        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("images")
+            .appendingPathComponent(item.localImagePath)
+        let local = await Task.detached(priority: .userInitiated) {
+            guard let data = try? Data(contentsOf: url) else { return UIImage?.none }
+            return UIImage(data: data)
+        }.value
+        if let local {
+            await MainActor.run { localImage = local }
+            return
+        }
+
+        // Fall back to Photos Library (e.g. after a reinstall where Documents was wiped)
         if let photosId = item.photosAssetIdentifier {
             let img = await PhotoLibraryService.shared.loadImage(
                 identifier: photosId,
                 targetSize: CGSize(width: size.width * 2, height: size.height * 2)
             )
             await MainActor.run { photosImage = img }
-            if img != nil { return }
         }
-
-        // Fall back to local Documents file
-        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("images")
-            .appendingPathComponent(item.localImagePath)
-        let img = await Task.detached(priority: .userInitiated) {
-            guard let data = try? Data(contentsOf: url) else { return UIImage?.none }
-            return UIImage(data: data)
-        }.value
-        await MainActor.run { localImage = img }
     }
 }

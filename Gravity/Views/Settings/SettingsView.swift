@@ -3,10 +3,14 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var immichService: ImmichService
     @StateObject private var vm = SettingsViewModel()
+    @AppStorage(AppAppearance.storageKey) private var appearanceRaw = AppAppearance.system.rawValue
+    @AppStorage(WardrobeLayout.storageKey) private var layoutRaw = WardrobeLayout.detailed.rawValue
 
     var body: some View {
         NavigationStack {
             Form {
+                appearanceSection
+                viewingSection
                 storageSection
                 if vm.storageBackend.requiresImmich {
                     immichSection
@@ -15,6 +19,56 @@ struct SettingsView: View {
                 aboutSection
             }
             .navigationTitle("Settings")
+        }
+    }
+
+    // MARK: - Appearance
+
+    private var appearanceSection: some View {
+        Section {
+            Picker("Theme", selection: $appearanceRaw) {
+                ForEach(AppAppearance.allCases) { option in
+                    Text(option.displayName).tag(option.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+        } header: {
+            Text("Appearance")
+        }
+    }
+
+    // MARK: - Viewing options
+
+    private var viewingSection: some View {
+        Section {
+            ForEach(WardrobeLayout.allCases) { layout in
+                Button {
+                    layoutRaw = layout.rawValue
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: layout.systemImage)
+                            .font(.title3)
+                            .foregroundStyle(Color.accentColor)
+                            .frame(width: 28)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(layout.displayName).font(.body).foregroundStyle(.primary)
+                            Text(layout.description).font(.caption).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        if layoutRaw == layout.rawValue {
+                            Image(systemName: "checkmark")
+                                .fontWeight(.semibold)
+                                .foregroundStyle(Color.accentColor)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+                .buttonStyle(.plain)
+            }
+        } header: {
+            Text("Viewing Options")
+        } footer: {
+            Text("Changes how items are shown in the Wardrobe tab.")
         }
     }
 

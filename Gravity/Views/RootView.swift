@@ -1,6 +1,12 @@
 import SwiftUI
 
 struct RootView: View {
+    @AppStorage(AppAppearance.storageKey) private var appearanceRaw = AppAppearance.system.rawValue
+
+    private var appearance: AppAppearance {
+        AppAppearance(rawValue: appearanceRaw) ?? .system
+    }
+
     var body: some View {
         TabView {
             WardrobeView()
@@ -23,5 +29,6 @@ struct RootView: View {
                     Label("Settings", systemImage: "gear")
                 }
         }
+        .preferredColorScheme(appearance.colorScheme)
     }
 }

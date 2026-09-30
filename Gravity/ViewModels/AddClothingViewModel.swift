@@ -25,6 +25,10 @@ class AddClothingViewModel: ObservableObject {
     @Published var isSaving = false
     @Published var didSave = false
 
+    /// Rotated by reset() so an in-flight processImage() stops writing results
+    /// after the user discards the photo mid-analysis.
+    private var processingToken = UUID()
+
     private static var imagesDir: URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let dir = docs.appendingPathComponent("images")
@@ -33,18 +37,23 @@ class AddClothingViewModel: ObservableObject {
     }
 
     func processImage(_ image: UIImage, aiService: AICategorizationService) async {
+        let token = UUID()
+        processingToken = token
+
         selectedImage = image
         processedImage = nil
         categorizationState = .removingBackground
 
         // Step 0: on-device background removal (iOS 17+)
         let bgRemoved = await BackgroundRemovalService.shared.removeBackground(from: image)
+        guard processingToken == token else { return }
         processedImage = bgRemoved
 
         categorizationState = .classifying
 
         // Phase 1: fast on-device Vision
         let visionResult = await aiService.classifyWithVision(image: bgRemoved)
+        guard processingToken == token else { return }
         result = visionResult
         editableCategory = visionResult.category
         editableSubcategory = visionResult.subcategory
@@ -53,6 +62,7 @@ class AddClothingViewModel: ObservableObject {
 
         // Phase 2: Ollama enrichment (if configured)
         let fullResult = await aiService.categorize(image: bgRemoved)
+        guard processingToken == token else { return }
         result = fullResult
         editableCategory = fullResult.category
         // Prefer Ollama's subcategory; otherwise keep Vision's if it still fits the parent.
@@ -114,6 +124,7 @@ class AddClothingViewModel: ObservableObject {
     }
 
     func reset() {
+        processingToken = UUID()
         selectedImage = nil
         processedImage = nil
         categorizationState = .idle

@@ -33,10 +33,10 @@ struct CanvasView: View {
 
     private var emptyCanvasHint: some View {
         VStack(spacing: 12) {
-            Image(systemName: "tshirt")
+            Image(systemName: "hand.draw")
                 .font(.system(size: 40))
                 .foregroundStyle(.tertiary)
-            Text("Tap items below or use\nSuggest to build an outfit")
+            Text("Tap items below to add them.\nDrag, pinch and rotate to arrange.")
                 .font(.subheadline)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
