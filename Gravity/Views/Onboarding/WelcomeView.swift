@@ -1,16 +1,20 @@
 import SwiftUI
 
-/// First-launch welcome flow. Every claim here is checked against what the app
-/// actually does; keep them in sync if storage or AI behaviour changes.
+/// First-launch welcome flow (3 pages). Every claim here is checked against what
+/// the app actually does; keep them in sync if storage or AI behaviour changes.
+///
+/// Branding: add an image set named `WelcomeLogo` to Assets.xcassets and it
+/// replaces the placeholder icon on the first page. No code change needed.
 struct WelcomeView: View {
     static let completedKey = "hasCompletedWelcome"
+    static let logoAssetName = "WelcomeLogo"
 
     @AppStorage(WelcomeView.completedKey) private var hasCompletedWelcome = false
     @AppStorage("storageBackend") private var storageBackendRaw = StorageBackend.local.rawValue
     @Environment(\.dismiss) private var dismiss
     @State private var page = 0
 
-    private let pageCount = 5
+    private let pageCount = 3
 
     var body: some View {
         VStack(spacing: 0) {
@@ -28,10 +32,8 @@ struct WelcomeView: View {
 
             TabView(selection: $page) {
                 welcomePage.tag(0)
-                freePage.tag(1)
-                storagePage.tag(2)
-                aiPage.tag(3)
-                tourPage.tag(4)
+                storagePage.tag(1)
+                aiPage.tag(2)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .animation(.easeInOut, value: page)
@@ -72,43 +74,69 @@ struct WelcomeView: View {
         dismiss()
     }
 
-    // MARK: - Pages
+    // MARK: - Page 1: welcome + free forever
 
     private var welcomePage: some View {
-        PageScaffold(
-            symbol: "tshirt.fill",
-            title: "Welcome to Gravity",
-            subtitle: "Thanks for downloading Gravity."
-        ) {
-            Text("Snap a photo of anything you own. Gravity cuts out the background, sorts it by type, and lets you build outfits on a canvas so you never forget a good combination again.")
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 24) {
+                logo
+                    .padding(.top, 8)
+
+                VStack(spacing: 6) {
+                    Text("Thanks for downloading.")
+                        .font(.title.bold())
+                        .multilineTextAlignment(.center)
+                    Text("Snap a photo of anything you own. The background is cut out, the type is sorted for you, and you can build outfits on a canvas so a good combination is never forgotten.")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Free. Forever.")
+                        .font(.headline)
+                    BulletRow(symbol: "xmark.circle.fill", text: "No subscriptions, ever.")
+                    BulletRow(symbol: "xmark.circle.fill", text: "No in-app purchases.")
+                    BulletRow(symbol: "xmark.circle.fill", text: "No accounts or sign-ups.")
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+            .padding(.horizontal, 28)
+            .padding(.bottom, 16)
         }
     }
 
-    private var freePage: some View {
-        PageScaffold(
-            symbol: "gift.fill",
-            title: "Free. Forever.",
-            subtitle: "No catch, no upsell."
-        ) {
-            VStack(alignment: .leading, spacing: 14) {
-                BulletRow(symbol: "xmark.circle.fill", text: "No subscriptions, ever.")
-                BulletRow(symbol: "xmark.circle.fill", text: "No in-app purchases.")
-                BulletRow(symbol: "xmark.circle.fill", text: "No accounts or sign-ups.")
-                BulletRow(symbol: "checkmark.circle.fill", text: "Every feature is available to everyone, from day one.", tint: .green)
-            }
+    /// Custom graphic if `WelcomeLogo` exists in the asset catalog, else a placeholder.
+    @ViewBuilder
+    private var logo: some View {
+        if let image = UIImage(named: Self.logoAssetName) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .frame(height: 140)
+        } else {
+            Image(systemName: "tshirt.fill")
+                .font(.system(size: 54, weight: .medium))
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 110, height: 110)
+                .background(Color.accentColor.opacity(0.12))
+                .clipShape(Circle())
         }
     }
+
+    // MARK: - Page 2: storage
 
     private var storagePage: some View {
         PageScaffold(
             symbol: "lock.shield.fill",
             title: "Your photos stay yours",
-            subtitle: "Gravity has no servers of its own."
+            subtitle: "There are no company servers. Pick where your photos live."
         ) {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Pick where your clothing photos live. You can change this any time in Settings.")
-                    .foregroundStyle(.secondary)
-
                 VStack(spacing: 10) {
                     storageOption(.local,
                                   symbol: "iphone",
@@ -121,12 +149,15 @@ struct WelcomeView: View {
                                   detail: "Backed up to an Immich server you run at home. Set the address in Settings.")
                 }
 
-                Text("Whichever you choose, a copy is kept on your iPhone so the app works offline.")
+                Text("A copy always stays on your iPhone so the app works offline. You can change this any time in Settings.")
                     .font(.footnote)
                     .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
+
+    // MARK: - Page 3: local AI
 
     private var aiPage: some View {
         PageScaffold(
@@ -138,28 +169,15 @@ struct WelcomeView: View {
                 BulletRow(symbol: "scissors",
                           text: "Background removal and categorization run on your iPhone using Apple's on-device Vision.")
                 BulletRow(symbol: "house.fill",
-                          text: "Optionally connect Ollama on a computer in your home for richer colors and tags. It only ever talks to the address you enter.")
+                          text: "Optionally connect Ollama on a computer in your home for richer colors and tags. It only talks to the address you enter.")
                 BulletRow(symbol: "eye.slash.fill",
-                          text: "No analytics, no tracking, no cloud AI. Your photos are never uploaded to Gravity or any third party.")
-            }
-        }
-    }
+                          text: "No analytics, no tracking, no cloud AI. Your photos are never uploaded anywhere you didn't choose.")
 
-    private var tourPage: some View {
-        PageScaffold(
-            symbol: "map.fill",
-            title: "Where things live",
-            subtitle: "A quick tour of the tabs."
-        ) {
-            VStack(alignment: .leading, spacing: 14) {
-                TourRow(symbol: "tshirt", title: "Wardrobe",
-                        text: "Everything you own, filtered by type. Tap an item to see it large, long-press to edit.")
-                TourRow(symbol: "plus.circle.fill", title: "Add Item",
-                        text: "Camera or library. The background is removed and the type is guessed for you.")
-                TourRow(symbol: "square.3.layers.3d", title: "Outfits",
-                        text: "Drag pieces onto a canvas, then save the look so you can find it again.")
-                TourRow(symbol: "gear", title: "Settings",
-                        text: "Storage, local AI, light or dark mode, and how the wardrobe is laid out.")
+                Text("Storage, AI, light or dark mode, and how the wardrobe is laid out all live in Settings.")
+                    .font(.footnote)
+                    .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 4)
             }
         }
     }
@@ -225,12 +243,13 @@ private struct PageScaffold<Content: View>: View {
 
                 VStack(spacing: 6) {
                     Text(title)
-                        .font(.largeTitle.bold())
+                        .font(.title.bold())
                         .multilineTextAlignment(.center)
                     Text(subtitle)
-                        .font(.headline)
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
                 content
@@ -256,29 +275,6 @@ private struct BulletRow: View {
                 .padding(.top, 2)
             Text(text)
                 .fixedSize(horizontal: false, vertical: true)
-        }
-    }
-}
-
-private struct TourRow: View {
-    let symbol: String
-    let title: String
-    let text: String
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: symbol)
-                .font(.title3)
-                .foregroundStyle(Color.accentColor)
-                .frame(width: 30)
-                .padding(.top, 1)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.subheadline.weight(.semibold))
-                Text(text)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
         }
     }
 }
