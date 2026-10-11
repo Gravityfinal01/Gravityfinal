@@ -3,7 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     /// Public feedback form shown under About. Create a form at tally.so (or Google Forms),
     /// copy its share link, and paste it here. The row is hidden while this placeholder remains.
-    static let feedbackFormURL = "https://tally.so/r/REPLACE_ME"
+    static let feedbackFormURL = "https://tally.so/r/9qL6xE"
 
     @EnvironmentObject private var immichService: ImmichService
     @StateObject private var vm = SettingsViewModel()
@@ -39,7 +39,8 @@ struct SettingsView: View {
             }
             .pickerStyle(.segmented)
 
-            // Eight swatches in one row; sized so they fit a standard iPhone form cell.
+            // One row of swatches that stretches edge to edge: each circle takes an equal
+            // share of the width (capped so they don't balloon on iPad).
             HStack(spacing: 10) {
                 ForEach(ThemeColor.allCases) { theme in
                     let selected = themeRaw == theme.rawValue
@@ -48,7 +49,8 @@ struct SettingsView: View {
                     } label: {
                         Circle()
                             .fill(theme.color)
-                            .frame(width: 28, height: 28)
+                            .frame(maxWidth: 40)
+                            .aspectRatio(1, contentMode: .fit)
                             .overlay {
                                 if selected {
                                     Image(systemName: "checkmark")
@@ -59,16 +61,16 @@ struct SettingsView: View {
                             .overlay {
                                 Circle()
                                     .strokeBorder(theme.color, lineWidth: 2)
-                                    .frame(width: 36, height: 36)
+                                    .padding(-4)
                                     .opacity(selected ? 1 : 0)
                             }
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(theme.displayName)
                 }
-                Spacer(minLength: 0)
             }
-            .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
         } header: {
             Text("Appearance")
         }

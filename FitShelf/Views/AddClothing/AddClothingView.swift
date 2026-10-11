@@ -24,7 +24,9 @@ struct AddClothingView: View {
                 .padding()
             }
             .navigationTitle("Add Clothing")
-            .sheet(isPresented: $showCamera) {
+            // Full screen rather than a sheet: UIImagePickerController's camera must be
+            // presented full screen on iPad or UIKit raises an exception.
+            .fullScreenCover(isPresented: $showCamera) {
                 CameraView { image in
                     showCamera = false
                     Task { await vm.processImage(image, aiService: aiService) }

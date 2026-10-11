@@ -8,6 +8,7 @@ struct ClothingGridView: View {
     let vm: WardrobeViewModel
 
     @AppStorage(WardrobeLayout.storageKey) private var layoutRaw = WardrobeLayout.detailed.rawValue
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @Query private var items: [ClothingItem]
     @Environment(\.modelContext) private var modelContext
     @State private var itemToDelete: ClothingItem?
@@ -58,13 +59,15 @@ struct ClothingGridView: View {
             if displayedItems.isEmpty {
                 emptyState
             } else {
+                // More columns on iPad (regular width) so cards keep a sensible size.
+                let wide = sizeClass == .regular
                 switch layout {
                 case .list:
                     listLayout
                 case .compact:
-                    gridLayout(columns: 3, spacing: 8) { compactCell($0) }
+                    gridLayout(columns: wide ? 6 : 3, spacing: 8) { compactCell($0) }
                 case .detailed:
-                    gridLayout(columns: 2, spacing: 12) { ClothingItemCard(item: $0) }
+                    gridLayout(columns: wide ? 4 : 2, spacing: 12) { ClothingItemCard(item: $0) }
                 }
             }
         }

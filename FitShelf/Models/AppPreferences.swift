@@ -29,7 +29,7 @@ enum AppAppearance: String, CaseIterable, Identifiable {
 /// App-wide accent color. Pastel-leaning but dark enough to carry white text.
 enum ThemeColor: String, CaseIterable, Identifiable {
     // Order is the order of the swatches in Settings.
-    case blue, sky, lavender, pink, red, yellow, green, brown
+    case blue, sky, lavender, purple, pink, red, yellow, green, brown
 
     static let storageKey = "themeColor"
 
@@ -40,6 +40,7 @@ enum ThemeColor: String, CaseIterable, Identifiable {
         case .blue:     return "Blue"
         case .sky:      return "Sky"
         case .lavender: return "Lavender"
+        case .purple:   return "Purple"
         case .pink:     return "Pink"
         case .red:      return "Red"
         case .yellow:   return "Yellow"
@@ -52,7 +53,8 @@ enum ThemeColor: String, CaseIterable, Identifiable {
         switch self {
         case .blue:     return Color(red: 0.36, green: 0.56, blue: 0.93)
         case .sky:      return Color(red: 0.47, green: 0.72, blue: 0.92)
-        case .lavender: return Color(red: 0.63, green: 0.56, blue: 0.90)
+        case .lavender: return Color(red: 0.68, green: 0.62, blue: 0.92)
+        case .purple:   return Color(red: 0.55, green: 0.42, blue: 0.85)
         case .pink:     return Color(red: 0.93, green: 0.55, blue: 0.72)
         case .red:      return Color(red: 0.90, green: 0.42, blue: 0.42)
         case .yellow:   return Color(red: 0.95, green: 0.76, blue: 0.31)
