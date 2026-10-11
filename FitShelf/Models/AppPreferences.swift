@@ -28,7 +28,8 @@ enum AppAppearance: String, CaseIterable, Identifiable {
 
 /// App-wide accent color. Pastel-leaning but dark enough to carry white text.
 enum ThemeColor: String, CaseIterable, Identifiable {
-    case blue, pink, yellow, brown, green, red
+    // Order is the order of the swatches in Settings.
+    case blue, sky, lavender, pink, red, yellow, green, brown
 
     static let storageKey = "themeColor"
 
@@ -36,23 +37,27 @@ enum ThemeColor: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .blue:   return "Blue"
-        case .pink:   return "Pink"
-        case .yellow: return "Yellow"
-        case .brown:  return "Brown"
-        case .green:  return "Green"
-        case .red:    return "Red"
+        case .blue:     return "Blue"
+        case .sky:      return "Sky"
+        case .lavender: return "Lavender"
+        case .pink:     return "Pink"
+        case .red:      return "Red"
+        case .yellow:   return "Yellow"
+        case .green:    return "Green"
+        case .brown:    return "Brown"
         }
     }
 
     var color: Color {
         switch self {
-        case .blue:   return Color(red: 0.36, green: 0.56, blue: 0.93)
-        case .pink:   return Color(red: 0.93, green: 0.55, blue: 0.72)
-        case .yellow: return Color(red: 0.90, green: 0.71, blue: 0.27)
-        case .brown:  return Color(red: 0.67, green: 0.51, blue: 0.38)
-        case .green:  return Color(red: 0.42, green: 0.72, blue: 0.55)
-        case .red:    return Color(red: 0.88, green: 0.47, blue: 0.47)
+        case .blue:     return Color(red: 0.36, green: 0.56, blue: 0.93)
+        case .sky:      return Color(red: 0.47, green: 0.72, blue: 0.92)
+        case .lavender: return Color(red: 0.63, green: 0.56, blue: 0.90)
+        case .pink:     return Color(red: 0.93, green: 0.55, blue: 0.72)
+        case .red:      return Color(red: 0.90, green: 0.42, blue: 0.42)
+        case .yellow:   return Color(red: 0.95, green: 0.76, blue: 0.31)
+        case .green:    return Color(red: 0.42, green: 0.72, blue: 0.55)
+        case .brown:    return Color(red: 0.67, green: 0.51, blue: 0.38)
         }
     }
 }

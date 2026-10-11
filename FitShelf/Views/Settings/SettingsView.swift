@@ -1,6 +1,10 @@
 import SwiftUI
 
 struct SettingsView: View {
+    /// Public feedback form shown under About. Create a form at tally.so (or Google Forms),
+    /// copy its share link, and paste it here. The row is hidden while this placeholder remains.
+    static let feedbackFormURL = "https://tally.so/r/REPLACE_ME"
+
     @EnvironmentObject private var immichService: ImmichService
     @StateObject private var vm = SettingsViewModel()
     @AppStorage(AppAppearance.storageKey) private var appearanceRaw = AppAppearance.system.rawValue
@@ -35,7 +39,8 @@ struct SettingsView: View {
             }
             .pickerStyle(.segmented)
 
-            HStack(spacing: 14) {
+            // Eight swatches in one row; sized so they fit a standard iPhone form cell.
+            HStack(spacing: 10) {
                 ForEach(ThemeColor.allCases) { theme in
                     let selected = themeRaw == theme.rawValue
                     Button {
@@ -43,18 +48,18 @@ struct SettingsView: View {
                     } label: {
                         Circle()
                             .fill(theme.color)
-                            .frame(width: 30, height: 30)
+                            .frame(width: 28, height: 28)
                             .overlay {
                                 if selected {
                                     Image(systemName: "checkmark")
-                                        .font(.caption.bold())
+                                        .font(.caption2.bold())
                                         .foregroundStyle(.white)
                                 }
                             }
                             .overlay {
                                 Circle()
                                     .strokeBorder(theme.color, lineWidth: 2)
-                                    .frame(width: 38, height: 38)
+                                    .frame(width: 36, height: 36)
                                     .opacity(selected ? 1 : 0)
                             }
                     }
@@ -232,6 +237,23 @@ struct SettingsView: View {
             // Reflects what the running data store was actually opened with,
             // so a silent fallback to local is visible without reading logs.
             LabeledContent("iCloud Sync", value: DataStore.activeBackend?.usesICloud == true ? "Active" : "Off")
+            if !Self.feedbackFormURL.contains("REPLACE_ME"), let url = URL(string: Self.feedbackFormURL) {
+                Link(destination: url) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Share a suggestion")
+                                .foregroundStyle(.primary)
+                            Text("FitShelf is always improving.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
             Button("Show Welcome Screen") {
                 hasCompletedWelcome = false
             }
