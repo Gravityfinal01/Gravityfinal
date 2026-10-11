@@ -143,7 +143,7 @@ struct SettingsView: View {
             Text("Storage")
         } footer: {
             if vm.needsRestartForStorage {
-                Label("Quit and reopen Gravity to switch iCloud sync \(vm.storageBackend.usesICloud ? "on" : "off").",
+                Label("Quit and reopen Closetry to switch iCloud sync \(vm.storageBackend.usesICloud ? "on" : "off").",
                       systemImage: "arrow.counterclockwise")
                     .foregroundStyle(.orange)
             } else {
@@ -238,7 +238,7 @@ struct SettingsView: View {
         } header: {
             Text("About")
         } footer: {
-            Text("Gravity is free forever with no subscriptions or in-app purchases. Your wardrobe stays on your iPhone, in your own iCloud, or on a server you run.")
+            Text("Closetry is free forever with no subscriptions or in-app purchases. Your wardrobe stays on your iPhone, in your own iCloud, or on a server you run.")
         }
     }
 

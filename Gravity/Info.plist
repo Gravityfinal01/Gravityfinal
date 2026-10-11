@@ -7,9 +7,9 @@
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleName</key>
-	<string>Gravity</string>
+	<string>Closetry</string>
 	<key>CFBundleDisplayName</key>
-	<string>Gravity</string>
+	<string>Closetry</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -19,11 +19,11 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Gravity uses your camera to photograph clothing items.</string>
+	<string>Closetry uses your camera to photograph clothing items.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Gravity reads your photo library to import clothing photos.</string>
+	<string>Closetry reads your photo library to import clothing photos.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Gravity can save a copy of each clothing cutout to your Photos app.</string>
+	<string>Closetry can save a copy of each clothing cutout to your Photos app.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
