@@ -109,7 +109,7 @@ struct WelcomeView: View {
                     .padding(.top, 8)
 
                 VStack(spacing: 6) {
-                    Text("Thanks for downloading.")
+                    Text("Thanks for your purchase.")
                         .font(.title.bold())
                         .multilineTextAlignment(.center)
                     Text("Snap a photo of anything you own. The background is cut out, the type is sorted for you, and you can build outfits on a canvas so a good combination is never forgotten.")
@@ -120,10 +120,12 @@ struct WelcomeView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Free. Forever.")
+                    Text("Pay once. Yours forever.")
                         .font(.headline)
+                    BulletRow(symbol: "checkmark.circle.fill", text: "Every future update included.", tint: .green)
                     BulletRow(symbol: "xmark.circle.fill", text: "No subscriptions, ever.")
                     BulletRow(symbol: "xmark.circle.fill", text: "No in-app purchases.")
+                    BulletRow(symbol: "xmark.circle.fill", text: "No ads.")
                     BulletRow(symbol: "xmark.circle.fill", text: "No accounts or sign-ups.")
                 }
                 .padding(16)

@@ -238,7 +238,7 @@ struct SettingsView: View {
         } header: {
             Text("About")
         } footer: {
-            Text("FitShelf is free forever with no subscriptions or in-app purchases. Your wardrobe stays on your iPhone, in your own iCloud, or on a server you run.")
+            Text("FitShelf is a one-time purchase. No subscriptions, no in-app purchases, no ads, and every update is included. Your wardrobe stays on your iPhone, in your own iCloud, or on a server you run.")
         }
     }
 
