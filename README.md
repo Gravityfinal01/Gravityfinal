@@ -1,6 +1,6 @@
 # FitShelf — Wardrobe App
 
-iPhone app to manage your wardrobe, plan outfits, and optionally sync photos to your self-hosted Immich server or iCloud Photos.
+An app to help you manage your wardrobe and plan outfits. With the option to sync the photos to your self-hosted Immich server or iCloud Photos, that way you save space on your phone and prevent losing your pictures.
 
 ## Features
 
