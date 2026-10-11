@@ -100,7 +100,7 @@ struct WelcomeView: View {
         }
     }
 
-    // MARK: - Page 1: welcome + free forever
+    // MARK: - Page 1: welcome + promises
 
     private var welcomePage: some View {
         ScrollView(showsIndicators: false) {
@@ -109,7 +109,7 @@ struct WelcomeView: View {
                     .padding(.top, 8)
 
                 VStack(spacing: 6) {
-                    Text("Thanks for your purchase.")
+                    Text("Thanks for downloading.")
                         .font(.title.bold())
                         .multilineTextAlignment(.center)
                     Text("Snap a photo of anything you own. The background is cut out, the type is sorted for you, and you can build outfits on a canvas so a good combination is never forgotten.")
@@ -119,14 +119,15 @@ struct WelcomeView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
+                // Wording is deliberately true whether the app is free or a one-time price.
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Pay once. Yours forever.")
+                    Text("Never a subscription.")
                         .font(.headline)
-                    BulletRow(symbol: "checkmark.circle.fill", text: "Every future update included.", tint: .green)
                     BulletRow(symbol: "xmark.circle.fill", text: "No subscriptions, ever.")
                     BulletRow(symbol: "xmark.circle.fill", text: "No in-app purchases.")
                     BulletRow(symbol: "xmark.circle.fill", text: "No ads.")
                     BulletRow(symbol: "xmark.circle.fill", text: "No accounts or sign-ups.")
+                    BulletRow(symbol: "checkmark.circle.fill", text: "Every update included.", tint: .green)
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .leading)
