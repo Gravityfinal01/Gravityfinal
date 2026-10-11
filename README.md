@@ -1,4 +1,4 @@
-# Gravity — Wardrobe App
+# FitShelf — Wardrobe App
 
 iPhone app to manage your wardrobe, plan outfits, and optionally sync photos to your self-hosted Immich server or iCloud Photos.
 
@@ -26,8 +26,8 @@ iPhone app to manage your wardrobe, plan outfits, and optionally sync photos to 
 ```bash
 git clone <repo-url>
 cd Gravityfinal
-xcodegen generate          # creates Gravity.xcodeproj
-open Gravity.xcodeproj
+xcodegen generate          # creates FitShelf.xcodeproj
+open FitShelf.xcodeproj
 ```
 
 In Xcode:
@@ -57,7 +57,7 @@ In the app: **Settings → Local AI → Enable Ollama** and enter the server URL
 ## Architecture
 
 ```
-Gravity/
+FitShelf/
 ├── Models/           ClothingItem, Outfit (SwiftData), ClothingCategory enum
 ├── Services/         ImmichService, AICategorizationService, PhotoLibraryService, NetworkMonitor
 ├── ViewModels/       WardrobeVM, AddClothingVM, OutfitPlannerVM, SettingsVM

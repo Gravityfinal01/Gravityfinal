@@ -92,7 +92,7 @@ class ImmichService: ObservableObject {
         req.httpMethod = "POST"
         req.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
 
-        let boundary = "GravityBoundary\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
+        let boundary = "FitShelfBoundary\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
 
         let now = ISO8601DateFormatter().string(from: Date())

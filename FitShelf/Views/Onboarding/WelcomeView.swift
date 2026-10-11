@@ -74,7 +74,7 @@ struct WelcomeView: View {
     }
 
     private func finish() {
-        // GravityApp watches this flag and swaps in the main UI (and opens the data store).
+        // FitShelfApp watches this flag and swaps in the main UI (and opens the data store).
         hasCompletedWelcome = true
     }
 

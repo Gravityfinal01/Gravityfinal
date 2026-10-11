@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct GravityApp: App {
+struct FitShelfApp: App {
     @StateObject private var immichService = ImmichService()
     @StateObject private var aiService = AICategorizationService()
     @StateObject private var networkMonitor = NetworkMonitor()
@@ -82,7 +82,7 @@ enum DataStore {
         do {
             return try ModelContainer(for: schema, configurations: [local])
         } catch {
-            fatalError("Could not open the Gravity data store: \(error)")
+            fatalError("Could not open the FitShelf data store: \(error)")
         }
     }
 }
