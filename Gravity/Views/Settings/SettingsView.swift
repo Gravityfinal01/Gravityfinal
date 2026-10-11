@@ -229,6 +229,9 @@ struct SettingsView: View {
             LabeledContent("Version", value: "1.0")
             LabeledContent("AI", value: "Apple Vision + Ollama (local)")
             LabeledContent("Storage", value: vm.storageBackend.displayName)
+            // Reflects what the running data store was actually opened with,
+            // so a silent fallback to local is visible without reading logs.
+            LabeledContent("iCloud Sync", value: DataStore.activeBackend?.usesICloud == true ? "Active" : "Off")
             Button("Show Welcome Screen") {
                 hasCompletedWelcome = false
             }
