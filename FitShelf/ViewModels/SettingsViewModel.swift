@@ -99,7 +99,7 @@ class SettingsViewModel: ObservableObject {
             try await service.ping()
             immichTestResult = .success
         } catch let e as ImmichError {
-            immichTestResult = .failure(e.localizedDescription ?? "Unknown error")
+            immichTestResult = .failure(e.errorDescription ?? "Unknown error")
         } catch {
             immichTestResult = .failure(error.localizedDescription)
         }
