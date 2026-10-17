@@ -97,7 +97,7 @@ struct ClothingDetailView: View {
                 Task { await wardrobeVM.deleteItem(item, context: modelContext) }
             }
         }
-        .task(id: item.id) {
+        .task(id: item.localImagePath) {
             image = await ClothingImageLoader.load(item)
         }
     }

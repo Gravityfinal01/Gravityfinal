@@ -20,7 +20,10 @@ class ClothingItem {
     var color: String?
     var brand: String?
     var tags: [String] = []
-    var localImagePath: String = ""      // filename inside Documents/images/
+    var localImagePath: String = ""      // filename inside Documents/images/ (local cache)
+    /// The cutout PNG itself. External storage keeps it out of the main database file,
+    /// and with iCloud on it syncs as a CloudKit asset. See ClothingImageLoader.
+    @Attribute(.externalStorage) var imageData: Data?
     var photosAssetIdentifier: String?   // PHAsset.localIdentifier when a copy was saved to Photos
     var immichAssetId: String?
     var immichAlbumId: String?

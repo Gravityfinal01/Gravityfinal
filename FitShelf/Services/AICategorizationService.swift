@@ -58,7 +58,7 @@ class AICategorizationService: ObservableObject {
     // MARK: On-device Vision pass (~100ms, always offline)
 
     func classifyWithVision(image: UIImage) async -> CategorizationResult {
-        guard let cgImage = image.cgImage else {
+        guard let cgImage = image.normalizedUp().cgImage else {
             return CategorizationResult(category: .other, color: nil, tags: [], confidence: 0, source: .vision)
         }
 

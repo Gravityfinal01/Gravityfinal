@@ -6,7 +6,9 @@ actor BackgroundRemovalService {
     static let shared = BackgroundRemovalService()
     private init() {}
 
-    func removeBackground(from image: UIImage) async -> UIImage {
+    func removeBackground(from original: UIImage) async -> UIImage {
+        // Vision works on raw pixels; make them upright first or portrait photos come out sideways.
+        let image = original.normalizedUp()
         guard let cgImage = image.cgImage else { return image }
         let request = VNGenerateForegroundInstanceMaskRequest()
         let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
@@ -23,7 +25,7 @@ actor BackgroundRemovalService {
             guard let cgOut = context.createCGImage(ciImage, from: ciImage.extent) else {
                 return image
             }
-            return UIImage(cgImage: cgOut)
+            return UIImage(cgImage: cgOut, scale: image.scale, orientation: .up)
         } catch {
             return image
         }

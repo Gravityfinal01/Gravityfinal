@@ -6,6 +6,8 @@ class OutfitPlannerViewModel: ObservableObject {
     typealias CanvasEntry = (item: ClothingItem, state: CanvasItemState)
 
     @Published var canvasEntries: [CanvasEntry] = []
+    /// The piece two-finger pinch/rotate and the rotate button act on.
+    @Published var selectedItemId: UUID?
     @Published var outfitName = ""
     /// Set when an outfit was loaded from Saved Outfits; Save then updates it in place.
     @Published var loadedOutfit: Outfit?
@@ -24,6 +26,7 @@ class OutfitPlannerViewModel: ObservableObject {
     // MARK: - Canvas
 
     func addItem(_ item: ClothingItem, at offset: CGSize? = nil) {
+        selectedItemId = item.id
         if canvasEntries.contains(where: { $0.item.id == item.id }) {
             bringToFront(item.id)
             return
@@ -44,6 +47,19 @@ class OutfitPlannerViewModel: ObservableObject {
 
     func removeItem(_ itemId: UUID) {
         canvasEntries.removeAll { $0.item.id == itemId }
+        if selectedItemId == itemId { selectedItemId = nil }
+    }
+
+    func state(for itemId: UUID) -> CanvasItemState? {
+        canvasEntries.first(where: { $0.item.id == itemId })?.state
+    }
+
+    /// Snaps to the next quarter turn clockwise: 90, 180, 270, then back to 0.
+    func rotateQuarterTurn(_ itemId: UUID) {
+        guard let idx = canvasEntries.firstIndex(where: { $0.item.id == itemId }) else { return }
+        let quarter = Double.pi / 2
+        let steps = (canvasEntries[idx].state.rotation / quarter).rounded() + 1
+        canvasEntries[idx].state.rotation = steps.truncatingRemainder(dividingBy: 4) * quarter
     }
 
     func bringToFront(_ itemId: UUID) {
@@ -60,6 +76,7 @@ class OutfitPlannerViewModel: ObservableObject {
 
     func clearCanvas() {
         canvasEntries.removeAll()
+        selectedItemId = nil
         slots.removeAll()
         outfitName = ""
         loadedOutfit = nil
@@ -134,6 +151,7 @@ class OutfitPlannerViewModel: ObservableObject {
             let filename = "\(outfit.id.uuidString)_\(Int(Date().timeIntervalSince1970)).jpg"
             try? jpeg.write(to: ClothingImageLoader.imagesDirectory.appendingPathComponent(filename))
             outfit.snapshotPath = filename
+            outfit.snapshotData = jpeg
         }
 
         try? context.save()

@@ -81,6 +81,12 @@ class AddClothingViewModel: ObservableObject {
         return base
     }
 
+    /// Turns the photo (and its cutout) 90 degrees clockwise. Four taps return to the start.
+    func rotateImage() {
+        processedImage = processedImage?.rotated90Clockwise()
+        selectedImage = selectedImage?.rotated90Clockwise()
+    }
+
     func saveItem(context: ModelContext) async {
         guard let image = processedImage ?? selectedImage else { return }
         isSaving = true
@@ -90,7 +96,7 @@ class AddClothingViewModel: ObservableObject {
         let filename = "\(itemId.uuidString).png"
         let imageURL = Self.imagesDir.appendingPathComponent(filename)
 
-        guard let png = image.pngData() else { return }
+        guard let png = ClothingImageLoader.pngForStorage(image) else { return }
         try? png.write(to: imageURL)
 
         // Optional copy in the user's Photos app (independent of the storage backend).
@@ -113,6 +119,7 @@ class AddClothingViewModel: ObservableObject {
             localImagePath: filename,
             photosAssetIdentifier: photosId
         )
+        item.imageData = png
         context.insert(item)
         try? context.save()
 

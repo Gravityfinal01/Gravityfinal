@@ -10,7 +10,9 @@ class Outfit {
     @Relationship(deleteRule: .nullify, inverse: \ClothingItem.outfits)
     var items: [ClothingItem]?
     var canvasStatesData: Data?     // encoded [String (UUID): CanvasItemState]
-    var snapshotPath: String?       // filename in Documents/images/
+    var snapshotPath: String?       // filename in Documents/images/ (local cache)
+    /// Snapshot JPEG; synced through iCloud like ClothingItem.imageData.
+    @Attribute(.externalStorage) var snapshotData: Data?
     var dateCreated: Date = Date()
     var lastModified: Date = Date()
 

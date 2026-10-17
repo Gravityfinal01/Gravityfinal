@@ -122,6 +122,18 @@ struct AddClothingView: View {
                     Spacer()
                     if vm.categorizationState != .removingBackground {
                         HStack {
+                            // Each tap turns the photo 90 degrees clockwise.
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.2)) { vm.rotateImage() }
+                            } label: {
+                                Image(systemName: "rotate.right")
+                                    .font(.subheadline.weight(.semibold))
+                                    .padding(9)
+                                    .background(.ultraThinMaterial)
+                                    .clipShape(Circle())
+                            }
+                            .accessibilityLabel("Rotate photo")
+                            .padding(12)
                             Spacer()
                             PhotosPicker(selection: $photoItem, matching: .images) {
                                 Image(systemName: "arrow.triangle.2.circlepath")

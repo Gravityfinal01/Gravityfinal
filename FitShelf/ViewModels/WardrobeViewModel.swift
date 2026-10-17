@@ -36,6 +36,8 @@ class WardrobeViewModel: ObservableObject {
             }
             changed = true
         }
+        // Items saved before photos were synced: copy their picture into the synced field.
+        if ClothingImageLoader.backfillSyncedData(all) { changed = true }
         if changed { try? context.save() }
     }
 
