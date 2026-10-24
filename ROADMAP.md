@@ -25,13 +25,9 @@ Goal: let people show off outfits and bring in new downloads.
 - Discord invite link.
 - "Report a bug" form (a second Tally form, separate from suggestions).
 - Existing "Share a suggestion" link moves here.
-- **Donations, careful:** Apple requires tips for an app to go through
-  In-App Purchase (guideline 3.1.1). An external Ko-fi/PayPal/Buy Me a Coffee
-  link inside the app is likely to be rejected. Options: a consumable
-  "Tip jar" IAP (needs the Paid Apps Agreement, banking and tax first), or
-  leave donations out of the app and link them only from the support website.
-  Also note the welcome screen promises "No in-app purchases": a tip jar
-  conflicts with that wording, so the copy would need to change first.
+- **Donations:** decided, not in the app. The donation link lives on the
+  Discord server and the Notion support page only. This keeps the app free of
+  In-App Purchase and keeps the "No in-app purchases" promise true.
 
 ### Better AI detection, as an option
 Keep Apple Vision as the default, add opt-in stronger detectors:
@@ -45,18 +41,24 @@ Keep Apple Vision as the default, add opt-in stronger detectors:
   Privacy label, privacy policy and welcome screen copy must all change, and
   the user must opt in explicitly.
 
-## Later — Social
+## Later — A better, cleaner experience
 
-A space to browse outfits other users chose to share. Big change, plan it
-on its own:
-- Needs a server, accounts and storage: breaks the current "no accounts,
-  no servers" promise, so the welcome copy, privacy policy and privacy label
-  all change.
-- Apple guideline 1.2 for user-generated content requires: content filtering,
-  a way to report posts, a way to block users, and published contact info.
-- Moderation effort and hosting cost are ongoing.
-- Lighter first step: public share links (1.1) plus a hashtag/Discord
-  channel, to see if people actually want a feed before building one.
+Social features are off the table: they would need accounts and servers and
+break the app's promises (no accounts, no servers, data stays with the user).
+Later updates focus on making FitShelf the nicest wardrobe app to use.
+
+Guiding rule: every change must keep the promises on the welcome screen true.
+
+Ideas to explore:
+- Restyle with the slate / mint / galaxy-blue palette from the store screenshots.
+- Smoother Add Item flow: fewer taps from photo to saved, batch adding several
+  pieces in one go.
+- Canvas polish: snapping guides, undo/redo, background choices for outfits.
+- Haptics and small animations on save, rotate and share.
+- Better empty states and first-run hints in each tab.
+- Accessibility pass: Dynamic Type, VoiceOver labels, contrast in every theme.
+- iPad layout tuned for landscape and Split View.
+- Human mode (body-model view), currently "Coming soon".
 
 ## Other open items
 
@@ -68,9 +70,6 @@ on its own:
   conversion. Ask Apple Support what the developer/seller name shows after
   conversion before starting.
 - **One-time price:** planned later; see the publishing guide, section 6.1.
-- **Human mode:** body-model outfit view, currently "Coming soon".
-- **App palette:** optional restyle with the slate / mint / galaxy-blue palette
-  used in the store screenshots.
 - **Store screenshots:** currently illustrated mockups; replace with real
   screenshots (neutral items) if App Review flags guideline 2.3.3.
 - **Repo:** remove "Claude" from early commit authors and rename the branch to
