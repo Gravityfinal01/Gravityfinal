@@ -10,6 +10,7 @@ struct OutfitPlannerView: View {
     @State private var mode: PlannerMode = .canvas
     @State private var showSaveSheet = false
     @State private var showSavedOutfits = false
+    @State private var showShareSheet = false
     @State private var drawerCategory: ClothingCategory?
     @State private var canvasSize = CGSize(width: 390, height: 480)
 
@@ -52,6 +53,11 @@ struct OutfitPlannerView: View {
                     vm.saveOutfit(context: modelContext, snapshot: snapshot)
                 }
                 .presentationDetents([.height(260)])
+            }
+            .sheet(isPresented: $showShareSheet) {
+                ShareOutfitSheet(name: vm.outfitName.isEmpty ? "My Outfit" : vm.outfitName) {
+                    await OutfitSnapshotRenderer.render(entries: vm.canvasEntries, canvasSize: canvasSize)
+                }
             }
             .sheet(isPresented: $showSavedOutfits) {
                 SavedOutfitsView { outfit in
@@ -172,9 +178,11 @@ struct OutfitPlannerView: View {
                 withAnimation { vm.clearCanvas() }
             } label: {
                 Label("Clear", systemImage: "trash")
+                    .labelStyle(.iconOnly)
             }
             .buttonStyle(.bordered)
             .disabled(vm.isEmpty)
+            .accessibilityLabel("Clear canvas")
 
             Button {
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
@@ -187,6 +195,17 @@ struct OutfitPlannerView: View {
             .disabled(activeItems.isEmpty)
 
             Spacer(minLength: 0)
+
+            Button {
+                vm.selectedItemId = nil
+                showShareSheet = true
+            } label: {
+                Label("Share", systemImage: "square.and.arrow.up")
+                    .labelStyle(.iconOnly)
+            }
+            .buttonStyle(.bordered)
+            .disabled(vm.isEmpty)
+            .accessibilityLabel("Share outfit")
 
             Button {
                 showSaveSheet = true

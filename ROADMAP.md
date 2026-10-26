@@ -2,24 +2,18 @@
 
 Notes for upcoming releases. Nothing here is built yet.
 
-## 1.1 — Share outfits (next update, top priority)
+## 2.0 — Fixes and outfit sharing (built, ready to ship)
 
-Goal: let people show off outfits and bring in new downloads.
+- Upright cutouts (camera rotation fix) and a rotate button on Add Item and Edit Item.
+- Canvas: one-finger drag, two-finger pinch and rotate anywhere, 90° rotate button.
+- Photos and outfit snapshots sync through iCloud.
+- New outfit gallery: bigger cards, detail view, Share, Edit on Canvas, Rename, Delete.
+- Share card (1080 x 1350) with outfit name and "Made with FitShelf", shared through
+  the system share sheet. Also a Share button on the canvas.
+- To do: set `AppLinks.appStoreURL` in `OutfitSharing.swift` once the App Store page
+  exists, so shares include a download link.
 
-- **Outfit gallery.** Replace the current Saved Outfits sheet with a proper
-  gallery: larger cards, a full-screen outfit view, rename, duplicate, delete,
-  sort by newest.
-- **Share button.** On each outfit, share a rendered image through the system
-  share sheet (Messages, WhatsApp, Instagram Stories, AirDrop, Save Image).
-  - Reuse `OutfitSnapshotRenderer`; render a clean "share card" version:
-    outfit on a soft background, outfit name, small FitShelf logo and
-    "Made with FitShelf" plus the App Store link once the app is live.
-  - SwiftUI `ShareLink` with a `Transferable` image is enough; no server needed.
-- **Privacy:** sharing is user-initiated and sends nothing to us, so the
-  "Data Not Collected" label stays accurate.
-- **Store:** update screenshots and What's New to show sharing.
-
-## 1.2 — Support section and smarter AI
+## 2.1 — Support section and smarter AI
 
 ### Support section (bottom of Settings)
 - Discord invite link.

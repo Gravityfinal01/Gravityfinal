@@ -41,4 +41,15 @@ enum OutfitSnapshotRenderer {
         renderer.scale = 2
         return renderer.uiImage
     }
+
+    /// Snapshot for a saved outfit: the stored one if present, otherwise re-rendered
+    /// from its saved layout (or a centred default for items without one).
+    static func snapshot(for outfit: Outfit) async -> UIImage? {
+        if let stored = await ClothingImageLoader.loadSnapshot(outfit) { return stored }
+        let states = outfit.canvasStates
+        let entries = (outfit.items ?? []).enumerated().map { index, item in
+            (item: item, state: states[item.id.uuidString] ?? CanvasItemState(zIndex: index))
+        }
+        return await render(entries: entries, canvasSize: CGSize(width: 390, height: 480))
+    }
 }
