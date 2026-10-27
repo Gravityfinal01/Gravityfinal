@@ -23,36 +23,22 @@ Notes for upcoming releases. Nothing here is built yet.
   Discord server and the Notion support page only. This keeps the app free of
   In-App Purchase and keeps the "No in-app purchases" promise true.
 
-### AI providers (decided)
+### AI detection (decided)
 
-Default stays Apple's on-device Vision: free, private, no setup. Everything
-else lives under a collapsed **Settings > Advanced > AI Provider** so normal
-users never see it.
+No cloud AI and no API keys: too complicated for a wardrobe app. Detection stays
+fully on-device. Ollama stays as it is today for self-hosters; consider moving it
+under a collapsed "Advanced" section.
 
-- **Ollama (self-hosted).** Keep it, moved into Advanced. Free; runs on the
-  user's own computer or server (e.g. an Unraid Ollama container with a vision
-  model such as llava or qwen2.5-vl). User enters the address.
-- **Bring your own API key** for OpenAI (ChatGPT), Anthropic (Claude) and
-  xAI (Grok). User pastes a key; FitShelf sends the photo to that provider to
-  get category, type, colour and tags.
-  - The setup screen must say plainly: a ChatGPT Plus / Claude Pro / Grok
-    subscription does NOT include API access. API keys are a separate
-    pay-as-you-go account (fractions of a cent per photo). Link each
-    provider's key page.
-  - Store keys in the Keychain, never in UserDefaults or iCloud.
-  - Send a downscaled image, only when the user adds an item. Off by default.
-  - Fallback: if the call fails or there's no key, use Apple Vision silently.
-- **Promises and privacy (must ship together with the feature):**
-  - Welcome screen AI page: change "No cloud AI" to say photos only leave the
-    phone if the user turns on a cloud provider in Advanced, and only to that
-    provider.
-  - Privacy policy: add a section naming OpenAI, Anthropic and xAI as
-    optional, user-chosen processors.
-  - App Store privacy label: review whether "Photos" must now be declared
-    (sent to a third party at the user's request). Update before submitting.
-  - First time a cloud provider is enabled: a one-time consent sheet.
-- Later candidates for a better *default*: Apple's on-device foundation models
-  (check image input support) and a bundled Core ML clothing classifier.
+Shipped in 2.0 (build 4):
+- Cutout cropped to the garment and placed on white before classifying.
+- Confidence-weighted scoring over Vision's top 30 labels, whole-word matching.
+- Local colour detection, so names read "Black T-Shirt" without Ollama.
+- Learns from the user's own corrections (stored on device).
+
+Next candidates:
+- Apple's on-device foundation models, if they accept images in the current SDK.
+- A bundled Core ML clothing classifier (trained with Create ML on a licensed
+  clothing dataset) for much better type detection.
 
 ## Later — A better, cleaner experience
 

@@ -51,18 +51,22 @@ class AddClothingViewModel: ObservableObject {
 
         categorizationState = .classifying
 
-        // Phase 1: fast on-device Vision
-        let visionResult = await aiService.classifyWithVision(image: bgRemoved)
+        // Phase 1: fast on-device Vision, on the garment cropped onto white.
+        let classifyImage = bgRemoved.preparedForClassification()
+        let detectedColor = bgRemoved.dominantColorName()
+        var visionResult = await aiService.classifyWithVision(image: classifyImage)
         guard processingToken == token else { return }
+        visionResult.color = detectedColor
         result = visionResult
         editableCategory = visionResult.category
         editableSubcategory = visionResult.subcategory
-        editableName = Self.defaultName(editableCategory, editableSubcategory, color: nil)
+        editableName = Self.defaultName(editableCategory, editableSubcategory, color: detectedColor)
         categorizationState = .enriching
 
         // Phase 2: Ollama enrichment (if configured)
-        let fullResult = await aiService.categorize(image: bgRemoved)
+        var fullResult = await aiService.categorize(image: classifyImage)
         guard processingToken == token else { return }
+        if fullResult.color == nil { fullResult.color = detectedColor }
         result = fullResult
         editableCategory = fullResult.category
         // Prefer Ollama's subcategory; otherwise keep Vision's if it still fits the parent.
@@ -120,6 +124,8 @@ class AddClothingViewModel: ObservableObject {
             photosAssetIdentifier: photosId
         )
         item.imageData = png
+        // Teach the on-device matcher what this user called it (corrections included).
+        LearnedLabels.learn(labels: result?.tags ?? [], category: editableCategory, subcategory: editableSubcategory)
         context.insert(item)
         try? context.save()
 

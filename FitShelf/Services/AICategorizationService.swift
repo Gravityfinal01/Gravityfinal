@@ -69,7 +69,7 @@ class AICategorizationService: ObservableObject {
                         category: .other, color: nil, tags: [], confidence: 0, source: .vision))
                     return
                 }
-                let top = observations.filter { $0.confidence > 0.05 }.prefix(15)
+                let top = observations.filter { $0.confidence > 0.01 }.prefix(30)
                 let (category, subcategory) = self.mapVisionToCategory(Array(top))
                 let tags = top.map { $0.identifier }
                 continuation.resume(returning: CategorizationResult(
@@ -86,72 +86,103 @@ class AICategorizationService: ObservableObject {
         }
     }
 
-    /// Two-pass keyword match: specific terms resolve to a subcategory (which implies its parent);
-    /// generic terms fall back to a top-level category only.
+    /// Scores every label Vision returns (weighted by its confidence) against clothing keywords,
+    /// plus what this user has taught it by correcting earlier items, and picks the best type.
+    /// Keywords match whole words only, so "ring" no longer fires on "earring" or "string".
     private func mapVisionToCategory(_ observations: [VNClassificationObservation]) -> (ClothingCategory, ClothingSubcategory?) {
-        let ids = observations.map { $0.identifier.lowercased() }
-
         let subRules: [(keywords: [String], sub: ClothingSubcategory)] = [
             // Tops
-            (["t-shirt", "tshirt", "tee_shirt"], .tshirt),
-            (["long sleeve", "long-sleeve", "longsleeve"], .longSleeve),
-            (["button", "dress shirt", "oxford shirt", "flannel"], .buttonUp),
-            (["polo"], .polo),
-            (["tank", "camisole", "sleeveless"], .tankTop),
+            (["t shirt", "tshirt", "tee", "tee shirt", "jersey"], .tshirt),
+            (["long sleeve", "longsleeve", "long sleeved shirt"], .longSleeve),
+            (["button down", "button up", "dress shirt", "oxford shirt", "flannel", "shirt collar"], .buttonUp),
+            (["polo", "polo shirt"], .polo),
+            (["tank top", "tank", "camisole", "sleeveless shirt", "singlet"], .tankTop),
             // Bottoms
-            (["shorts", "bermuda", "cutoff"], .shorts),
-            (["jeans"], .jeans),
-            (["sweatpant", "jogger", "track pant"], .sweatpants),
-            (["slacks", "chino", "trouser", "dress pant"], .dressPants),
-            (["skirt"], .skirt),
+            (["shorts", "bermuda shorts", "cutoffs"], .shorts),
+            (["jeans", "denim", "blue jeans"], .jeans),
+            (["sweatpants", "joggers", "jogger", "track pants", "trackpants"], .sweatpants),
+            (["slacks", "chinos", "chino", "trousers", "dress pants", "khakis"], .dressPants),
+            (["skirt", "miniskirt", "kilt"], .skirt),
             // Jackets
-            (["puffer", "down jacket", "quilted"], .puffer),
-            (["vest", "gilet"], .vest),
-            (["coat", "trench", "parka", "blazer"], .coat),
+            (["puffer", "puffer jacket", "down jacket", "quilted jacket", "parka"], .puffer),
+            (["vest", "gilet", "waistcoat"], .vest),
+            (["coat", "overcoat", "trench coat", "raincoat", "blazer", "peacoat"], .coat),
             // Sweaters
-            (["zip-up", "zip up", "zipper"], .zipUp),
-            (["hoodie", "hoody", "hooded"], .hoodie),
-            (["turtleneck", "turtle neck", "roll neck"], .turtleneck),
+            (["zip up", "zip hoodie", "zipper"], .zipUp),
+            (["hoodie", "hoody", "hooded sweatshirt"], .hoodie),
+            (["turtleneck", "turtle neck", "roll neck", "polo neck"], .turtleneck),
             (["cardigan"], .cardigan),
             (["crewneck", "crew neck", "sweatshirt"], .crewneck),
-            (["sweater", "pullover", "jumper", "knitwear"], .sweater),
+            (["sweater", "pullover", "jumper", "knitwear", "wool sweater"], .sweater),
             // Shoes
-            (["boot"], .boots),
-            (["sneaker", "trainer", "running shoe", "athletic shoe"], .athletic),
-            (["heel", "stiletto"], .heels),
-            (["loafer", "dress shoe", "brogue", "oxford shoe"], .dressShoes),
-            (["flats", "ballet flat"], .flats),
-            (["sandal", "flip flop", "flip-flop"], .sandals),
+            (["boot", "boots", "cowboy boot", "hiking boot", "chelsea boot"], .boots),
+            (["sneaker", "sneakers", "trainer", "running shoe", "athletic shoe", "tennis shoe", "basketball shoe"], .athletic),
+            (["high heel", "high heels", "heel", "stiletto", "pump"], .heels),
+            (["loafer", "dress shoe", "brogue", "oxford shoe", "derby shoe"], .dressShoes),
+            (["ballet flat", "flats"], .flats),
+            (["sandal", "sandals", "flip flop", "flip flops", "slide"], .sandals),
             // Accessories
-            (["bag", "purse", "handbag", "backpack", "tote"], .bag),
-            (["earring"], .earrings),
+            (["bag", "purse", "handbag", "backpack", "tote", "tote bag", "satchel", "clutch"], .bag),
+            (["earring", "earrings"], .earrings),
             (["bracelet", "bangle"], .bracelet),
-            (["necklace", "pendant"], .necklace),
+            (["necklace", "pendant", "chain"], .necklace),
             (["wristwatch", "watch"], .watch),
-            (["belt"], .belt),
-            (["ring"], .ring),
+            (["belt", "belt buckle"], .belt),
+            (["ring", "wedding ring"], .ring),
         ]
 
         let catRules: [(keywords: [String], cat: ClothingCategory)] = [
-            (["shirt", "blouse", "top_"], .tops),
-            (["pants", "leggings"], .bottoms),
-            (["jacket", "windbreaker", "outerwear"], .jackets),
-            (["shoe", "footwear"], .shoes),
-            (["dress", "gown", "frock", "jumpsuit"], .dresses),
-            (["hat", "cap", "scarf", "glove", "jewelry", "accessory", "accessori"], .accessories),
+            (["shirt", "blouse", "top", "clothing top"], .tops),
+            (["pants", "leggings", "bottoms"], .bottoms),
+            (["jacket", "windbreaker", "outerwear", "bomber jacket", "denim jacket", "leather jacket"], .jackets),
+            (["shoe", "shoes", "footwear"], .shoes),
+            (["dress", "gown", "frock", "jumpsuit", "sundress"], .dresses),
+            (["hat", "cap", "beanie", "scarf", "glove", "gloves", "jewelry", "accessory", "sunglasses"], .accessories),
         ]
 
-        for id in ids {
-            for rule in subRules where rule.keywords.contains(where: { id.contains($0) }) {
-                return (rule.sub.parent, rule.sub)
+        func matches(_ label: String, _ keyword: String) -> Bool {
+            let padded = " \(label) "
+            return padded.contains(" \(keyword) ") || padded.contains(" \(keyword)s ")
+        }
+
+        let learned = LearnedLabels.table
+        var subScores: [ClothingSubcategory: Double] = [:]
+        var catScores: [ClothingCategory: Double] = [:]
+
+        for observation in observations {
+            let label = LearnedLabels.normalize(observation.identifier)
+            let weight = Double(observation.confidence)
+
+            var matchedSub = false
+            for rule in subRules where rule.keywords.contains(where: { matches(label, $0) }) {
+                subScores[rule.sub, default: 0] += weight
+                matchedSub = true
+            }
+            // "dress shirt" is a shirt, not a dress: skip broad rules when a specific one matched.
+            if !matchedSub {
+                for rule in catRules where rule.keywords.contains(where: { matches(label, $0) }) {
+                    catScores[rule.cat, default: 0] += weight
+                }
+            }
+
+            // What this user filed similar photos under before.
+            for (target, count) in learned[label] ?? [:] {
+                let boost = weight * min(Double(count), 5) * 0.6
+                if target.hasPrefix("sub:"), let sub = ClothingSubcategory(rawValue: String(target.dropFirst(4))) {
+                    subScores[sub, default: 0] += boost
+                } else if target.hasPrefix("cat:"), let cat = ClothingCategory(rawValue: String(target.dropFirst(4))) {
+                    catScores[cat, default: 0] += boost
+                }
             }
         }
-        for id in ids {
-            for rule in catRules where rule.keywords.contains(where: { id.contains($0) }) {
-                return (rule.cat, nil)
-            }
+
+        for (sub, score) in subScores { catScores[sub.parent, default: 0] += score }
+
+        guard let best = catScores.max(by: { $0.value < $1.value }), best.value >= 0.02 else {
+            return (.other, nil)
         }
-        return (.other, nil)
+        let sub = subScores.filter { $0.key.parent == best.key }.max(by: { $0.value < $1.value })?.key
+        return (best.key, sub)
     }
 
     // MARK: Ollama enrichment — local network only, adds color/brand/tags

@@ -102,6 +102,9 @@ struct EditClothingView: View {
     }
 
     private func save() {
+        if category != item.category || subcategory != item.subcategory {
+            LearnedLabels.learn(labels: item.tags, category: category, subcategory: subcategory)
+        }
         item.name = trimmedName
         item.category = category
         item.subcategory = subcategory
